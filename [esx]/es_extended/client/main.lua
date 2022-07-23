@@ -289,6 +289,19 @@ AddEventHandler('esx:setJob', function(Job)
 	ESX.SetPlayerData('job', Job)
 end)
 
+RegisterNetEvent('esx:setJob2')
+AddEventHandler('esx:setJob2', function(Job)
+	if Config.EnableHud then
+		local gradeLabel = Job.grade_label ~= Job.label and Job.grade_label or ''
+		if gradeLabel ~= '' then gradeLabel = ' - '..gradeLabel end
+		ESX.UI.HUD.UpdateElement('job2', {
+			job_label = Job.label,
+			grade_label = gradeLabel
+		})
+	end
+	ESX.SetPlayerData('job2', Job)
+end)
+
 RegisterNetEvent('esx:spawnVehicle')
 AddEventHandler('esx:spawnVehicle', function(vehicle)
 	ESX.TriggerServerCallback("esx:isUserAdmin", function(admin)

@@ -117,6 +117,7 @@ function loadESXPlayer(identifier, playerId, isNew)
         accounts = {},
         inventory = {},
         job = {},
+        job2 = {},
         loadout = {},
         playerName = GetPlayerName(playerId),
         weight = 0
@@ -124,6 +125,7 @@ function loadESXPlayer(identifier, playerId, isNew)
 
     local result = MySQL.prepare.await(loadPlayer, {identifier})
     local job, grade, jobObject, gradeObject = result.job, tostring(result.job_grade)
+    local job2, grade2, job2Object, grade2Object = result.job2, tostring(result.job2_grade)
     local foundAccounts, foundItems = {}, {}
 
     -- Accounts
@@ -172,6 +174,35 @@ function loadESXPlayer(identifier, playerId, isNew)
         userData.job.skin_female = json.decode(gradeObject.skin_female)
     end
 
+    -- Job2
+    if ESX.DoesJobExist(job2, grade2) then
+        job2Object, grade2Object = ESX.Jobs[job2], ESX.Jobs[job2].grades[grade2]
+    else
+        print(('[^3WARNING^7] Ignoring invalid job for %s [job: %s, grade: %s]'):format(identifier, job2, grade2))
+        job2, grade2 = 'unemployed', '0'
+        job2Object, grade2Object = ESX.Jobs[job2], ESX.Jobs[job2].grades[grade2]
+    end
+
+    userData.job2.id = job2Object.id
+    userData.job2.name = job2Object.name
+    userData.job2.label = job2Object.label
+
+    userData.job2.grade = tonumber(grade2)
+    userData.job2.grade_name = grade2Object.name
+    userData.job2.grade_label = grade2Object.label
+    userData.job2.grade_salary = grade2Object.salary
+    userData.job2.onDuty = Config.OnDuty
+
+    userData.job2.skin_male = {}
+    userData.job2.skin_female = {}
+
+    if grade2Object.skin_male then
+        userData.job2.skin_male = json.decode(grade2Object.skin_male)
+    end
+    if grade2Object.skin_female then
+        userData.job2.skin_female = json.decode(grade2Object.skin_female)
+    end
+
     -- Inventory
     if not Config.OxInventory then
         if result.inventory and result.inventory ~= '' then
@@ -218,8 +249,14 @@ function loadESXPlayer(identifier, playerId, isNew)
 
     -- Group
     if result.group then
-        if result.group == "superadmin" then
+        if result.group == "dev" then
+            userData.group = "dev"
+        elseif result.group == "superadmin" then
+            userData.group = "superadmin"
+        elseif result.group == "admin" then
             userData.group = "admin"
+        elseif result.group == "mod" then
+            userData.group = "mod"
         else
             userData.group = result.group
         end
@@ -326,6 +363,7 @@ function loadESXPlayer(identifier, playerId, isNew)
         identifier = xPlayer.getIdentifier(),
         inventory = xPlayer.getInventory(),
         job = xPlayer.getJob(),
+        job2 = xPlayer.getJob2(),
         loadout = xPlayer.getLoadout(),
         maxWeight = xPlayer.getMaxWeight(),
         money = xPlayer.getMoney(),
@@ -625,6 +663,7 @@ ESX.RegisterServerCallback('esx:getPlayerData', function(source, cb)
         accounts = xPlayer.getAccounts(),
         inventory = xPlayer.getInventory(),
         job = xPlayer.getJob(),
+        job2 = xPlayer.getJob2(),
         loadout = xPlayer.getLoadout(),
         money = xPlayer.getMoney(),
 		position = xPlayer.getCoords(true)
@@ -643,6 +682,7 @@ ESX.RegisterServerCallback('esx:getOtherPlayerData', function(source, cb, target
         accounts = xPlayer.getAccounts(),
         inventory = xPlayer.getInventory(),
         job = xPlayer.getJob(),
+        job2 = xPlayer.getJob2(),
         loadout = xPlayer.getLoadout(),
         money = xPlayer.getMoney(),
 		position = xPlayer.getCoords(true)

@@ -162,6 +162,10 @@ ESX.RegisterCommand('job', {"user", "admin"}, function(xPlayer, args, showError)
 	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getJob().name.. "^0 - ^5".. xPlayer.getJob().grade_label .. "^0")
 end, true)
 
+ESX.RegisterCommand('job2', {"user", "admin"}, function(xPlayer, args, showError)
+	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getJob2().name.. "^0 - ^5".. xPlayer.getJob2().grade_label .. "^0")
+end, true)
+
 ESX.RegisterCommand('info', {"user", "admin"}, function(xPlayer, args, showError)
 	local job = xPlayer.getJob().name
 	local jobgrade = xPlayer.getJob().grade_name

@@ -164,10 +164,12 @@ function ESX.TriggerServerCallback(name, requestId, source, cb, ...)
 end
 
 function Core.SavePlayer(xPlayer, cb)
-	MySQL.prepare('UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?', {
+	MySQL.prepare('UPDATE `users` SET `accounts` = ?, `job` = ?, `job_grade` = ?, `job2` = ?, `job2_grade` = ?, `group` = ?, `position` = ?, `inventory` = ?, `loadout` = ? WHERE `identifier` = ?', {
 		json.encode(xPlayer.getAccounts(true)),
 		xPlayer.job.name,
 		xPlayer.job.grade,
+		xPlayer.job2.name,
+		xPlayer.job2.grade,
 		xPlayer.group,
 		json.encode(xPlayer.getCoords()),
 		json.encode(xPlayer.getInventory(true)),
@@ -194,6 +196,8 @@ function Core.SavePlayers(cb)
 				json.encode(xPlayer.getAccounts(true)),
 				xPlayer.job.name,
 				xPlayer.job.grade,
+				xPlayer.job2.name,
+				xPlayer.job2.grade,
 				xPlayer.group,
 				json.encode(xPlayer.getCoords()),
 				json.encode(xPlayer.getInventory(true)),
@@ -224,7 +228,7 @@ function ESX.GetExtendedPlayers(key, val)
 	local xPlayers = {}
 	for k, v in pairs(ESX.Players) do
 		if key then
-			if (key == 'job' and v.job.name == val) or v[key] == val then
+			if (key == 'job' and v.job.name == val) or (key == 'job2' and v.job2.name == val) or v[key] == val then
 				xPlayers[#xPlayers + 1] = v
 			end
 		else
@@ -392,7 +396,11 @@ function Core.IsPlayerAdmin(playerId)
 	local xPlayer = ESX.GetPlayerFromId(playerId)
 
 	if xPlayer then
-		if xPlayer.group == 'admin' then
+		if xPlayer.group == 'dev' then
+			return true
+		elseif xPlayer.group == 'superadmin' then
+			return true
+		elseif xPlayer.group == 'admin' then
 			return true
 		end
 	end
