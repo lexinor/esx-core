@@ -90,6 +90,7 @@ Locales['fr'] = {
   ['command_setjob_job'] = 'nom du job',
   ['command_setjob_grade'] = 'grade du job',
   ['command_setjob_invalid'] = 'le job, le grade ou les deux sont invalides',
+  ['command_setjob2'] = 'assigner job2 à un joueur',
   ['command_setgroup'] = 'assigner un groupe à un joueur',
   ['command_setgroup_group'] = 'nom du groupe',
   ['commanderror_argumentmismatch'] = 'argument count mismatch (passed %s, wanted %s)',
