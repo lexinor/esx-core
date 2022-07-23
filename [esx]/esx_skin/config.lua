@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Locale = 'en'
+Config.Locale = 'fr'
 
 Config.BackpackWeight = {
 	[40] = 16, 
