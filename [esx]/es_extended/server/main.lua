@@ -395,7 +395,7 @@ AddEventHandler('playerDropped', function(reason)
 
     if xPlayer then
         TriggerEvent('esx:playerDropped', playerId, reason)
-
+        TriggerEvent('lexinor:updateLastConnection', xPlayer.identifier)
         Core.SavePlayer(xPlayer, function()
             ESX.Players[playerId] = nil
         end)
@@ -733,4 +733,19 @@ AddEventHandler('esx:setDuty', function(bool)
         xPlayer.triggerEvent('esx:showNotification', _U('stopped_duty'))
     end
     TriggerClientEvent('esx:setJob', xPlayer.source, xPlayer.job)
+end)
+
+RegisterNetEvent('lexinor:updateLastConnection')
+AddEventHandler('lexinor:updateLastConnection', function(identifier)
+	if identifier then
+		local currentTime = os.date("%d/%m/%Y")
+		MySQL.Async.execute("UPDATE users SET last_connection = @currentTime WHERE identifier = @identifier", {
+			["@identifier"] = identifier,
+			["@currentTime"] = currentTime,
+		}, function(hasUpdatedConnectionDate)
+			if hasUpdatedConnectionDate then
+				print("Last connection date updated for users : "..identifier)
+			end
+		end)
+	end
 end)
