@@ -6,6 +6,11 @@ AddEventHandler('esx:setJob', function(job)
 	RefreshBussHUD()
 end)
 
+RegisterNetEvent('esx:setFaction')
+AddEventHandler('esx:setFaction', function(faction)
+	ESX.PlayerData.faction = faction
+end)
+
 RegisterNetEvent('esx:playerLoaded')
 AddEventHandler('esx:playerLoaded', function(xPlayer)
 	ESX.PlayerData = xPlayer
@@ -186,14 +191,22 @@ end
 
 function OpenEmployeeList(society)
 	ESX.TriggerServerCallback('esx_society:getEmployees', function(employees)
-
+		local gradeLabel, event, selected
 		local elements = {
 			head = {_U('employee'), _U('grade'), _U('actions')},
 			rows = {}
 		}
 
 		for i=1, #employees, 1 do
-			local gradeLabel = (employees[i].job.grade_label == '' and employees[i].job.label or employees[i].job.grade_label)
+			if society == ESX.PlayerData.job.name then
+				gradeLabel = (employees[i].job.grade_label == '' and employees[i].job.label or employees[i].job.grade_label)
+				event = 'setJob'
+				selected = 'unemployed'
+			elseif society == ESX.PlayerData.faction.name then
+				gradeLabel = (employees[i].faction.grade_label == '' and employees[i].faction.label or employees[i].faction.grade_label)
+				event = 'setFaction'
+				selected = 'nofaction'
+			end
 
 			table.insert(elements.rows, {
 				data = employees[i],
@@ -214,9 +227,9 @@ function OpenEmployeeList(society)
 			elseif data.value == 'fire' then
 				ESX.ShowNotification(_U('you_have_fired', employee.name))
 
-				ESX.TriggerServerCallback('esx_society:setJob', function()
+				ESX.TriggerServerCallback('esx_society:'..event, function()
 					OpenEmployeeList(society)
-				end, employee.identifier, 'unemployed', 0, 'fire')
+				end, employee.identifier, selected, 0, 'fire')
 			end
 		end, function(data, menu)
 			menu.close()
@@ -226,11 +239,19 @@ function OpenEmployeeList(society)
 end
 
 function OpenRecruitMenu(society)
+	local  event, selected
+	if society == ESX.PlayerData.job.name then
+		event = 'setJob'
+		selected = 'job'
+	elseif society == ESX.PlayerData.faction.name then
+		event = 'setFaction'
+		selected = 'faction'
+	end
 	ESX.TriggerServerCallback('esx_society:getOnlinePlayers', function(players)
 		local elements = {}
 
 		for i=1, #players, 1 do
-			if players[i].job.name ~= society then
+			if players[i][selected].name ~= society then
 				table.insert(elements, {
 					label = players[i].name,
 					value = players[i].source,
@@ -257,7 +278,7 @@ function OpenRecruitMenu(society)
 				if data2.current.value == 'yes' then
 					ESX.ShowNotification(_U('you_have_hired', data.current.name))
 
-					ESX.TriggerServerCallback('esx_society:setJob', function()
+					ESX.TriggerServerCallback('esx_society:'..event, function()
 						OpenRecruitMenu(society)
 					end, data.current.identifier, society, 0, 'hire')
 				end
@@ -271,16 +292,26 @@ function OpenRecruitMenu(society)
 end
 
 function OpenPromoteMenu(society, employee)
-	ESX.TriggerServerCallback('esx_society:getJob', function(job)
+	local ecallback, event, selected
+	if society == ESX.PlayerData.faction.name then
+		ecallback = 'getFaction'
+		event = 'setFaction'
+		selected = 'faction'
+	elseif society == ESX.PlayerData.job.name then
+		ecallback = 'getJob'
+		event = 'setJob'
+		selected = 'job'
+	end
+	ESX.TriggerServerCallback('esx_society:'..ecallback, function(jf)
 		local elements = {}
 
-		for i=1, #job.grades, 1 do
-			local gradeLabel = (job.grades[i].label == '' and job.label or job.grades[i].label)
+		for i=1, #jf.grades, 1 do
+			local gradeLabel = (jf.grades[i].label == '' and jf.label or jf.grades[i].label)
 
 			table.insert(elements, {
 				label = gradeLabel,
-				value = job.grades[i].grade,
-				selected = (employee.job.grade == job.grades[i].grade)
+				value = jf.grades[i].grade,
+				selected = (employee[selected].grade == jf.grades[i].grade)
 			})
 		end
 
@@ -292,7 +323,7 @@ function OpenPromoteMenu(society, employee)
 			menu.close()
 			ESX.ShowNotification(_U('you_have_promoted', employee.name, data.current.label))
 
-			ESX.TriggerServerCallback('esx_society:setJob', function()
+			ESX.TriggerServerCallback('esx_society:'..event, function()
 				OpenEmployeeList(society)
 			end, employee.identifier, society, data.current.value, 'promote')
 		end, function(data, menu)
@@ -303,15 +334,25 @@ function OpenPromoteMenu(society, employee)
 end
 
 function OpenManageGradesMenu(society)
-	ESX.TriggerServerCallback('esx_society:getJob', function(job)
+	local ecallback, event, selected
+	if society == ESX.PlayerData.faction.name then
+		ecallback = 'getFaction'
+		event = 'setFactionSalary'
+		selected = 'faction'
+	elseif society == ESX.PlayerData.job.name then
+		ecallback = 'getJob'
+		event = 'setJobSalary'
+		selected = 'job'
+	end
+	ESX.TriggerServerCallback('esx_society:'..ecallback, function(jf)
 		local elements = {}
 
-		for i=1, #job.grades, 1 do
-			local gradeLabel = (job.grades[i].label == '' and job.label or job.grades[i].label)
+		for i=1, #jf.grades, 1 do
+			local gradeLabel = (jf.grades[i].label == '' and jf.label or jf.grades[i].label)
 
 			table.insert(elements, {
-				label = ('%s - <span style="color:green;">%s</span>'):format(gradeLabel, _U('money_generic', ESX.Math.GroupDigits(job.grades[i].salary))),
-				value = job.grades[i].grade
+				label = ('%s - <span style="color:green;">%s</span>'):format(gradeLabel, _U('money_generic', ESX.Math.GroupDigits(jf.grades[i].salary))),
+				value = jf.grades[i].grade
 			})
 		end
 
@@ -333,7 +374,7 @@ function OpenManageGradesMenu(society)
 				else
 					menu2.close()
 
-					ESX.TriggerServerCallback('esx_society:setJobSalary', function()
+					ESX.TriggerServerCallback('esx_society:'..event, function()
 						OpenManageGradesMenu(society)
 					end, society, data.current.value, amount)
 				end

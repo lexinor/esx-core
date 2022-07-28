@@ -1,4 +1,4 @@
-function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, weight, job, job2, loadout, name, coords)
+function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, weight, job, faction, loadout, name, coords)
 	local targetOverrides = Config.PlayerFunctionOverride and Core.PlayerFunctionOverrides[Config.PlayerFunctionOverride] or {}
 	
 	local self = {}
@@ -9,7 +9,7 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 	self.identifier = identifier
 	self.inventory = inventory
 	self.job = job
-	self.job2 = job2
+	self.faction = faction
 	self.loadout = loadout
 	self.name = name
 	self.playerId = playerId
@@ -129,8 +129,8 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		return self.job
 	end
 
-	function self.getJob2()
-		return self.job2
+	function self.getFaction()
+		return self.faction
 	end
 
 	function self.getLoadout(minimal)
@@ -330,38 +330,38 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 		end
 	end
 
-	function self.setJob2(job, grade)
-		grade = tostring(grade)
-		local lastJob = json.decode(json.encode(self.job2))
-
-		if ESX.DoesJobExist(job, grade) then
-			local jobObject, gradeObject = ESX.Jobs[job], ESX.Jobs[job].grades[grade]
-
-			self.job2.id    = jobObject.id
-			self.job2.name  = jobObject.name
-			self.job2.label = jobObject.label
-
-			self.job2.grade        = tonumber(grade)
-			self.job2.grade_name   = gradeObject.name
-			self.job2.grade_label  = gradeObject.label
-			self.job2.grade_salary = gradeObject.salary
-
-			if gradeObject.skin_male then
-				self.job2.skin_male = json.decode(gradeObject.skin_male)
+	function self.setFaction(faction, gradef)
+		gradef = tostring(gradef)
+		local lastFaction = json.decode(json.encode(self.faction))
+	
+		if ESX.DoesFactionExist(faction, gradef) then
+			local factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
+	
+			self.faction.id    = factionObject.id
+			self.faction.name  = factionObject.name
+			self.faction.label = factionObject.label
+	
+			self.faction.grade        = tonumber(gradef)
+			self.faction.grade_name   = gradefObject.name
+			self.faction.grade_label  = gradefObject.label
+			self.faction.grade_salary = gradefObject.salary
+	
+			if gradefObject.skin_male then
+				self.faction.skin_male = json.decode(gradefObject.skin_male)
 			else
-				self.job2.skin_male = {}
+				self.faction.skin_male = {}
 			end
-
-			if gradeObject.skin_female then
-				self.job2.skin_female = json.decode(gradeObject.skin_female)
+	
+			if gradefObject.skin_female then
+				self.faction.skin_female = json.decode(gradefObject.skin_female)
 			else
-				self.job2.skin_female = {}
+				self.faction.skin_female = {}
 			end
-
-			TriggerEvent('esx:setJob2', self.source, self.job2, lastJob)
-			self.triggerEvent('esx:setJob2', self.job2)
+	
+			TriggerEvent('esx:setFaction', self.source, self.faction, lastFaction)
+			self.triggerEvent('esx:setFaction', self.faction)
 		else
-			print(('[es_extended] [^3WARNING^7] Ignoring invalid .setJob2() usage for "%s"'):format(self.identifier))
+			print(('[es_extended] [^3WARNING^7] Ignoring invalid .setFaction() usage for "%s"'):format(self.identifier))
 		end
 	end
 

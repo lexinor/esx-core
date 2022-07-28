@@ -14,13 +14,35 @@ CREATE TABLE `users` (
 	`inventory` LONGTEXT NULL DEFAULT NULL,
 	`job` VARCHAR(20) NULL DEFAULT 'unemployed',
 	`job_grade` INT NULL DEFAULT 0,
-	`job2` VARCHAR(20) NULL DEFAULT 'unemployed',
-	`job2_grade` INT NULL DEFAULT 0,
+	`faction` VARCHAR(20) NULL DEFAULT 'nofaction',
+	`faction_grade` INT NULL DEFAULT 0,
 	`loadout` LONGTEXT NULL DEFAULT NULL,
 	`position` VARCHAR(255) NULL DEFAULT '{"x":-269.4,"y":-955.3,"z":31.2,"heading":205.8}',
 
 	PRIMARY KEY (`identifier`)
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `factions` (
+  `name` varchar(50) NOT NULL,
+  `label` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`name`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `factions` (`name`, `label`) VALUES ('nofaction', 'Sans Faction');
+
+CREATE TABLE IF NOT EXISTS `faction_grades` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `faction_name` varchar(50) COLLATE utf8mb4_bin DEFAULT NULL,
+  `grade` int(11) NOT NULL,
+  `name` varchar(50) COLLATE utf8mb4_bin NOT NULL,
+  `label` varchar(50) COLLATE utf8mb4_bin NOT NULL,
+  `salary` int(11) NOT NULL,
+  `skin_male` longtext COLLATE utf8mb4_bin NOT NULL,
+  `skin_female` longtext COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+INSERT INTO `faction_grades` (`id`, `faction_name`, `grade`, `name`, `label`, `salary`, `skin_male`, `skin_female`) VALUES (1, 'nofaction', 0, 'nofaction', 'Sans faction', 0, '{}', '{}');
 
 
 CREATE TABLE `items` (

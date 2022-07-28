@@ -18,16 +18,16 @@ end, true, {help = _U('command_setjob'), validate = true, arguments = {
 	{name = 'grade', help = _U('command_setjob_grade'), type = 'number'}
 }})
 
-ESX.RegisterCommand('setjob2', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
-	if ESX.DoesJobExist(args.job, args.grade) then
-		args.playerId.setJob2(args.job, args.grade)
+ESX.RegisterCommand('setfaction', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
+	if ESX.DoesFactionExist(args.faction, args.grade) then
+		args.playerId.setFaction(args.faction, args.grade)
 	else
-		showError(_U('command_setjob_invalid'))
+		showError('Commande setfaction invalide!')
 	end
-end, true, {help = _U('command_setjob'), validate = true, arguments = {
+end, true, {help = 'Commande setfaction', validate = true, arguments = {
 	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-	{name = 'job', help = _U('command_setjob_job'), type = 'string'},
-	{name = 'grade', help = _U('command_setjob_grade'), type = 'number'}
+	{name = 'faction', help = 'faction', type = 'string'},
+	{name = 'grade', help = 'grade', type = 'number'}
 }})
 
 ESX.RegisterCommand('car', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
@@ -174,8 +174,8 @@ ESX.RegisterCommand('job', { "dev", "superadmin", "admin", "mod", "user"}, funct
 	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getJob().name.. "^0 - ^5".. xPlayer.getJob().grade_label .. "^0")
 end, true)
 
-ESX.RegisterCommand('job2', { "dev", "superadmin", "admin", "mod", "user"}, function(xPlayer, args, showError)
-	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getJob2().name.. "^0 - ^5".. xPlayer.getJob2().grade_label .. "^0")
+ESX.RegisterCommand('faction', { "dev", "superadmin", "admin", "mod", "user"}, function(xPlayer, args, showError)
+	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getFaction().name.. "^0 - ^5".. xPlayer.getFaction().grade_label .. "^0")
 end, true)
 
 ESX.RegisterCommand('info', {"dev", "superadmin", "admin", "user"}, function(xPlayer, args, showError)

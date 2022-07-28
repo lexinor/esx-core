@@ -1,4 +1,5 @@
 local Jobs = {}
+local Factions = {}
 local RegisteredSocieties = {}
 
 function GetSociety(name)
@@ -11,17 +12,28 @@ end
 
 AddEventHandler('onResourceStart', function(resourceName)
 	if resourceName == GetCurrentResourceName() then
-		local result = MySQL.query.await('SELECT * FROM jobs')
+		local result_job = MySQL.query.await('SELECT * FROM jobs')
+		local result_faction = MySQL.query.await('SELECT * FROM factions')
 
-		for i = 1, #result, 1 do
-			Jobs[result[i].name] = result[i]
-			Jobs[result[i].name].grades = {}
+		for i = 1, #result_job do
+			Jobs[result_job[i].name] = result_job[i]
+			Jobs[result_job[i].name].grades = {}
 		end
 
-		local result2 = MySQL.query.await('SELECT * FROM job_grades')
+		for i = 1, #result_faction do
+			Factions[result_faction[i].name] = result_faction[i]
+			Factions[result_faction[i].name].grades = {}
+		end
 
-		for i = 1, #result2, 1 do
-			Jobs[result2[i].job_name].grades[tostring(result2[i].grade)] = result2[i]
+		local result2_job = MySQL.query.await('SELECT * FROM job_grades')
+		local result2_faction = MySQL.query.await('SELECT * FROM faction_grades')
+
+		for i = 1, #result2_job do
+			Jobs[result2_job[i].job_name].grades[tostring(result2_job[i].grade)] = result2_job[i]
+		end
+
+		for i = 1, #result2_faction do
+			Factions[result2_faction[i].faction_name].grades[tostring(result2_faction[i].grade)] = result2_faction[i]
 		end
 	end
 end)
@@ -64,7 +76,7 @@ AddEventHandler('esx_society:withdrawMoney', function(societyName, amount)
 	local society = GetSociety(societyName)
 	amount = ESX.Math.Round(tonumber(amount))
 
-	if xPlayer.job.name == society.name then
+	if (xPlayer.job.name == society.name) or (xPlayer.faction.name == society.name) then
 		TriggerEvent('esx_addonaccount:getSharedAccount', society.account, function(account)
 			if amount > 0 and account.money >= amount then
 				account.removeMoney(amount)
@@ -85,7 +97,7 @@ AddEventHandler('esx_society:depositMoney', function(societyName, amount)
 	local society = GetSociety(societyName)
 	amount = ESX.Math.Round(tonumber(amount))
 
-	if xPlayer.job.name == society.name then
+	if (xPlayer.job.name == society.name) or (xPlayer.faction.name == society.name) then
 		if amount > 0 and xPlayer.getMoney() >= amount then
 			TriggerEvent('esx_addonaccount:getSharedAccount', society.account, function(account)
 				xPlayer.removeMoney(amount)
@@ -106,7 +118,7 @@ AddEventHandler('esx_society:washMoney', function(society, amount)
 	local account = xPlayer.getAccount('black_money')
 	amount = ESX.Math.Round(tonumber(amount))
 
-	if xPlayer.job.name == society then
+	if (xPlayer.job.name == society.name) or (xPlayer.faction.name == society.name) then
 		if amount and amount > 0 and account.money >= amount then
 			xPlayer.removeAccountMoney('black_money', amount)
 
@@ -166,69 +178,209 @@ end)
 ESX.RegisterServerCallback('esx_society:getEmployees', function(source, cb, society)
 	local employees = {}
 
-	local xPlayers = ESX.GetExtendedPlayers('job', society)
-	for _, xPlayer in pairs(xPlayers) do
+	local Player = ESX.GetPlayerFromId(source)
 
-		local name = xPlayer.name
-		if Config.EnableESXIdentity and name == GetPlayerName(xPlayer.source) then
-			name = xPlayer.get('firstName') .. ' ' .. xPlayer.get('lastName')
+	if Player.job.name == society then
+		local xPlayers = ESX.GetExtendedPlayers('job', society)
+		for _, xPlayer in pairs(xPlayers) do
+	
+			local name = xPlayer.name
+			if Config.EnableESXIdentity and name == GetPlayerName(xPlayer.source) then
+				name = xPlayer.get('firstName') .. ' ' .. xPlayer.get('lastName')
+			end
+	
+			table.insert(employees, {
+				name = name,
+				identifier = xPlayer.identifier,
+				job = {
+					name = society,
+					label = xPlayer.job.label,
+					grade = xPlayer.job.grade,
+					grade_name = xPlayer.job.grade_name,
+					grade_label = xPlayer.job.grade_label
+				}
+			})
 		end
+			
+		local query = "SELECT identifier, job_grade FROM `users` WHERE `job`= ? ORDER BY job_grade DESC"
+	
+		if Config.EnableESXIdentity then
+			query = "SELECT identifier, job_grade, firstname, lastname FROM `users` WHERE `job`= ? ORDER BY job_grade DESC"
+		end
+	
+		MySQL.query(query, {society},
+		function(result)
+			for k, row in pairs(result) do
+				local alreadyInTable
+				local identifier = row.identifier
+	
+				for k, v in pairs(employees) do
+					if v.identifier == identifier then
+						alreadyInTable = true
+					end
+				end
+	
+				if not alreadyInTable then
+					local name = "Name not found." -- maybe this should be a locale instead ¯\_(ツ)_/¯
+	
+					if Config.EnableESXIdentity then
+						name = row.firstname .. ' ' .. row.lastname 
+					end
+					
+					table.insert(employees, {
+						name = name,
+						identifier = identifier,
+						job = {
+							name = society,
+							label = Jobs[society].label,
+							grade = row.job_grade,
+							grade_name = Jobs[society].grades[tostring(row.job_grade)].name,
+							grade_label = Jobs[society].grades[tostring(row.job_grade)].label
+						}
+					})
+				end
+			end
+	
+			cb(employees)
+		end)
 
-		table.insert(employees, {
-			name = name,
-			identifier = xPlayer.identifier,
-			job = {
-				name = society,
-				label = xPlayer.job.label,
-				grade = xPlayer.job.grade,
-				grade_name = xPlayer.job.grade_name,
-				grade_label = xPlayer.job.grade_label
-			}
-		})
-	end
+	elseif Player.faction.name == society then
 		
-	local query = "SELECT identifier, job_grade FROM `users` WHERE `job`= ? ORDER BY job_grade DESC"
+		local xPlayers = ESX.GetExtendedPlayers('faction', society)
+		for _, xPlayer in pairs(xPlayers) do
+	
+			local name = xPlayer.name
+			if Config.EnableESXIdentity and name == GetPlayerName(xPlayer.source) then
+				name = xPlayer.get('firstName') .. ' ' .. xPlayer.get('lastName')
+			end
+	
+			table.insert(employees, {
+				name = name,
+				identifier = xPlayer.identifier,
+				faction = {
+					name = society,
+					label = xPlayer.faction.label,
+					grade = xPlayer.faction.grade,
+					grade_name = xPlayer.faction.grade_name,
+					grade_label = xPlayer.faction.grade_label
+				}
+			})
+		end
+			
+		local query = "SELECT identifier, faction_grade FROM `users` WHERE `faction`= ? ORDER BY faction_grade DESC"
+	
+		if Config.EnableESXIdentity then
+			query = "SELECT identifier, faction_grade, firstname, lastname FROM `users` WHERE `faction`= ? ORDER BY faction_grade DESC"
+		end
+	
+		MySQL.query(query, {society},
+		function(result)
+			for k, row in pairs(result) do
+				local alreadyInTable
+				local identifier = row.identifier
+	
+				for k, v in pairs(employees) do
+					if v.identifier == identifier then
+						alreadyInTable = true
+					end
+				end
+	
+				if not alreadyInTable then
+					local name = "Name not found." -- maybe this should be a locale instead ¯\_(ツ)_/¯
+	
+					if Config.EnableESXIdentity then
+						name = row.firstname .. ' ' .. row.lastname 
+					end
+					
+					table.insert(employees, {
+						name = name,
+						identifier = identifier,
+						faction = {
+							name = society,
+							label = Factions[society].label,
+							grade = row.faction_grade,
+							grade_name = Factions[society].grades[tostring(row.faction_grade)].name,
+							grade_label = Factions[society].grades[tostring(row.faction_grade)].label
+						}
+					})
+				end
+			end
+	
+			cb(employees)
+		end)
+	end
+end)
 
-	if Config.EnableESXIdentity then
-		query = "SELECT identifier, job_grade, firstname, lastname FROM `users` WHERE `job`= ? ORDER BY job_grade DESC"
+ESX.RegisterServerCallback('esx_society:getFaction', function(source, cb, society)
+	local faction = json.decode(json.encode(Factions[society]))
+	local grades = {}
+
+	for k,v in pairs(faction.grades) do
+		table.insert(grades, v)
 	end
 
-	MySQL.query(query, {society},
-	function(result)
-		for k, row in pairs(result) do
-			local alreadyInTable
-			local identifier = row.identifier
-
-			for k, v in pairs(employees) do
-				if v.identifier == identifier then
-					alreadyInTable = true
-				end
-			end
-
-			if not alreadyInTable then
-				local name = "Name not found." -- maybe this should be a locale instead ¯\_(ツ)_/¯
-
-				if Config.EnableESXIdentity then
-					name = row.firstname .. ' ' .. row.lastname 
-				end
-				
-				table.insert(employees, {
-					name = name,
-					identifier = identifier,
-					job = {
-						name = society,
-						label = Jobs[society].label,
-						grade = row.job_grade,
-						grade_name = Jobs[society].grades[tostring(row.job_grade)].name,
-						grade_label = Jobs[society].grades[tostring(row.job_grade)].label
-					}
-				})
-			end
-		end
-
-		cb(employees)
+	table.sort(grades, function(a, b)
+		return a.grade < b.grade
 	end)
 
+	faction.grades = grades
+
+	cb(faction)
+end)
+
+ESX.RegisterServerCallback('esx_society:setFaction', function(source, cb, identifier, faction, grade, type)
+	local xPlayer = ESX.GetPlayerFromId(source)
+	local isBoss = xPlayer.faction.grade_name == 'boss'
+
+	if isBoss then
+		local xTarget = ESX.GetPlayerFromIdentifier(identifier)
+
+		if xTarget then
+			xTarget.setFaction(faction, grade)
+
+			if type == 'hire' then
+				xTarget.showNotification(_U('you_have_been_hired', faction))
+			elseif type == 'promote' then
+				xTarget.showNotification(_U('you_have_been_promoted'))
+			elseif type == 'fire' then
+				xTarget.showNotification(_U('you_have_been_fired', xTarget.getFaction().label))
+			end
+
+			cb()
+		else
+			MySQL.update('UPDATE users SET faction = ?, faction_grade = ? WHERE identifier = ?', {faction, grade, identifier},
+			function(rowsChanged)
+				cb()
+			end)
+		end
+	else
+		print(('esx_society: %s attempted to setFaction'):format(xPlayer.identifier))
+		cb()
+	end
+end)
+
+ESX.RegisterServerCallback('esx_society:setFactionLabel', function(source, cb, faction, grade, label)
+	local xPlayer = ESX.GetPlayerFromId(source)
+
+	if xPlayer.faction.name == faction and xPlayer.faction.grade_name == 'boss' then
+			MySQL.update('UPDATE faction_grades SET label = ? WHERE faction_name = ? AND grade = ?', {label, faction, grade},
+			function(rowsChanged)
+				Factions[faction].grades[tostring(grade)].label = label
+				ESX.RefreshFactions()
+				Wait(1)
+				local xPlayers = ESX.GetExtendedPlayers('faction', faction)
+				for _, xTarget in pairs(xPlayers) do
+
+					if xTarget.faction.grade == grade then
+						xTarget.setFaction(faction, grade)
+					end
+				end
+				cb()
+			end)
+	else
+		print(('esx_society: %s attempted to setFactionSalary'):format(xPlayer.identifier))
+		cb()
+	end
 end)
 
 ESX.RegisterServerCallback('esx_society:getJob', function(source, cb, society)
@@ -308,6 +460,35 @@ ESX.RegisterServerCallback('esx_society:setJobSalary', function(source, cb, job,
 	end
 end)
 
+ESX.RegisterServerCallback('esx_society:setFactionSalary', function(source, cb, faction, grade, salary)
+	local xPlayer = ESX.GetPlayerFromId(source)
+
+	if xPlayer.faction.name == faction and xPlayer.faction.grade_name == 'boss' then
+		if salary <= Config.MaxSalary then
+			MySQL.update('UPDATE faction_grades SET salary = ? WHERE faction_name = ? AND grade = ?', {salary, faction, grade},
+			function(rowsChanged)
+				Factions[faction].grades[tostring(grade)].salary = salary
+				ESX.RefreshFactions()
+				Wait(1)
+				local xPlayers = ESX.GetExtendedPlayers('faction', faction)
+				for _, xTarget in pairs(xPlayers) do
+
+					if xTarget.faction.grade == grade then
+						xTarget.setFaction(faction, grade)
+					end
+				end
+				cb()
+			end)
+		else
+			print(('esx_society: %s attempted to setFactionSalary over config limit!'):format(xPlayer.identifier))
+			cb()
+		end
+	else
+		print(('esx_society: %s attempted to setFactionSalary'):format(xPlayer.identifier))
+		cb()
+	end
+end)
+
 
 ESX.RegisterServerCallback('esx_society:setJobLabel', function(source, cb, job, grade, label)
 	local xPlayer = ESX.GetPlayerFromId(source)
@@ -344,7 +525,8 @@ ESX.RegisterServerCallback('esx_society:getOnlinePlayers', function(source, cb)
 				source = xPlayer.source,
 				identifier = xPlayer.identifier,
 				name = xPlayer.name,
-				job = xPlayer.job
+				job = xPlayer.job,
+				faction = xPlayer.faction,
 			})
 		end
 		cb(onlinePlayers)
@@ -366,14 +548,14 @@ ESX.RegisterServerCallback('esx_society:getVehiclesInGarage', function(source, c
 	end)
 end)
 
-ESX.RegisterServerCallback('esx_society:isBoss', function(source, cb, job)
-	cb(isPlayerBoss(source, job))
+ESX.RegisterServerCallback('esx_society:isBoss', function(source, cb, society)
+	cb(isPlayerBoss(source, society))
 end)
 
-function isPlayerBoss(playerId, job)
+function isPlayerBoss(playerId, society)
 	local xPlayer = ESX.GetPlayerFromId(playerId)
 
-	if xPlayer.job.name == job and xPlayer.job.grade_name == 'boss' then
+	if (xPlayer.job.name == society and xPlayer.job.grade_name == 'boss') or (xPlayer.faction.name == society and xPlayer.faction.grade_name == 'boss') then
 		return true
 	else
 		print(('esx_society: %s attempted open a society boss menu!'):format(xPlayer.identifier))

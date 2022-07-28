@@ -2,7 +2,7 @@ SetMapName('San Andreas')
 SetGameType('ESX Legacy')
 
 local newPlayer = 'INSERT INTO `users` SET `accounts` = ?, `identifier` = ?, `group` = ?'
-local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `group`, `position`, `inventory`, `skin`, `loadout`'
+local loadPlayer = 'SELECT `accounts`, `job`, `job_grade`, `faction`, `faction_grade`, `group`, `position`, `inventory`, `skin`, `loadout`'
 
 if Config.Multichar then
     newPlayer = newPlayer .. ', `firstname` = ?, `lastname` = ?, `dateofbirth` = ?, `sex` = ?, `height` = ?'
@@ -33,7 +33,7 @@ else
     RegisterNetEvent('esx:onPlayerJoined')
     AddEventHandler('esx:onPlayerJoined', function()
         local _source = source
-        while not next(ESX.Jobs) do
+        while not next(ESX.Jobs) and not next(ESX.Factions) do
             Wait(50)
         end
 
@@ -117,7 +117,7 @@ function loadESXPlayer(identifier, playerId, isNew)
         accounts = {},
         inventory = {},
         job = {},
-        job2 = {},
+        faction = {},
         loadout = {},
         playerName = GetPlayerName(playerId),
         weight = 0
@@ -125,7 +125,7 @@ function loadESXPlayer(identifier, playerId, isNew)
 
     local result = MySQL.prepare.await(loadPlayer, {identifier})
     local job, grade, jobObject, gradeObject = result.job, tostring(result.job_grade)
-    local job2, grade2, job2Object, grade2Object = result.job2, tostring(result.job2_grade)
+    local faction, gradef, factionObject, gradefObject = result.faction, tostring(result.faction_grade)
     local foundAccounts, foundItems = {}, {}
 
     -- Accounts
@@ -174,33 +174,33 @@ function loadESXPlayer(identifier, playerId, isNew)
         userData.job.skin_female = json.decode(gradeObject.skin_female)
     end
 
-    -- Job2
-    if ESX.DoesJobExist(job2, grade2) then
-        job2Object, grade2Object = ESX.Jobs[job2], ESX.Jobs[job2].grades[grade2]
+    -- Faction
+    if ESX.DoesFactionExist(faction, gradef) then
+        factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
     else
-        print(('[^3WARNING^7] Ignoring invalid job for %s [job: %s, grade: %s]'):format(identifier, job2, grade2))
-        job2, grade2 = 'unemployed', '0'
-        job2Object, grade2Object = ESX.Jobs[job2], ESX.Jobs[job2].grades[grade2]
+        print(('[^3WARNING^7] Ignoring invalid faction for %s [faction: %s, grade: %s]'):format(identifier, faction, gradef))
+        faction, gradef = 'nofaction', '0'
+        factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
     end
 
-    userData.job2.id = job2Object.id
-    userData.job2.name = job2Object.name
-    userData.job2.label = job2Object.label
+    userData.faction.id = factionObject.id
+    userData.faction.name = factionObject.name
+    userData.faction.label = factionObject.label
 
-    userData.job2.grade = tonumber(grade2)
-    userData.job2.grade_name = grade2Object.name
-    userData.job2.grade_label = grade2Object.label
-    userData.job2.grade_salary = grade2Object.salary
-    userData.job2.onDuty = Config.OnDuty
+    userData.faction.grade = tonumber(gradef)
+    userData.faction.grade_name = gradefObject.name
+    userData.faction.grade_label = gradefObject.label
+    userData.faction.grade_salary = gradefObject.salary
+    userData.faction.onDuty = Config.OnDuty
 
-    userData.job2.skin_male = {}
-    userData.job2.skin_female = {}
+    userData.faction.skin_male = {}
+    userData.faction.skin_female = {}
 
-    if grade2Object.skin_male then
-        userData.job2.skin_male = json.decode(grade2Object.skin_male)
+    if gradefObject.skin_male then
+        userData.faction.skin_male = json.decode(gradefObject.skin_male)
     end
-    if grade2Object.skin_female then
-        userData.job2.skin_female = json.decode(grade2Object.skin_female)
+    if gradefObject.skin_female then
+        userData.faction.skin_female = json.decode(gradefObject.skin_female)
     end
 
     -- Inventory
@@ -338,7 +338,7 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
 
     local xPlayer = CreateExtendedPlayer(playerId, identifier, userData.group, userData.accounts, userData.inventory,
-        userData.weight, userData.job, userData.loadout, userData.playerName, userData.coords)
+        userData.weight, userData.job, userData.faction, userData.loadout, userData.playerName, userData.coords)
     ESX.Players[playerId] = xPlayer
 
     if userData.firstname then
@@ -363,7 +363,7 @@ function loadESXPlayer(identifier, playerId, isNew)
         identifier = xPlayer.getIdentifier(),
         inventory = xPlayer.getInventory(),
         job = xPlayer.getJob(),
-        job2 = xPlayer.getJob2(),
+        faction = xPlayer.getFaction(),
         loadout = xPlayer.getLoadout(),
         maxWeight = xPlayer.getMaxWeight(),
         money = xPlayer.getMoney(),
@@ -663,7 +663,7 @@ ESX.RegisterServerCallback('esx:getPlayerData', function(source, cb)
         accounts = xPlayer.getAccounts(),
         inventory = xPlayer.getInventory(),
         job = xPlayer.getJob(),
-        job2 = xPlayer.getJob2(),
+        faction = xPlayer.getFaction(),
         loadout = xPlayer.getLoadout(),
         money = xPlayer.getMoney(),
 		position = xPlayer.getCoords(true)
@@ -682,7 +682,7 @@ ESX.RegisterServerCallback('esx:getOtherPlayerData', function(source, cb, target
         accounts = xPlayer.getAccounts(),
         inventory = xPlayer.getInventory(),
         job = xPlayer.getJob(),
-        job2 = xPlayer.getJob2(),
+        faction = xPlayer.getFaction(),
         loadout = xPlayer.getLoadout(),
         money = xPlayer.getMoney(),
 		position = xPlayer.getCoords(true)
