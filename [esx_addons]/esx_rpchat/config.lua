@@ -1,5 +1,5 @@
 Config = {}
 
-Config.Locale = 'en'
+Config.Locale = 'fr'
 Config.OnlyFirstname = false
 Config.EnableESXIdentity = true -- RP names
