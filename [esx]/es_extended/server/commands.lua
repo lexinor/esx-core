@@ -148,7 +148,10 @@ end
 
 ESX.RegisterCommand('setgroup', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if not args.playerId then args.playerId = xPlayer.source end
-	if args.group == "superadmin" then args.group = { "dev", "superadmin", "admin"} end
+	if args.group == "dev" then args.group = "dev" end
+	if args.group == "superadmin" then args.group = "superadmin" end
+	if args.group == "admin" then args.group = "admin" end
+	if args.group == "mod" then args.group = "mod" end
 	args.playerId.setGroup(args.group)
 end, true, {help = _U('command_setgroup'), validate = true, arguments = {
 	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
@@ -175,7 +178,7 @@ ESX.RegisterCommand('job', { "dev", "superadmin", "admin", "mod", "user"}, funct
 end, true)
 
 ESX.RegisterCommand('faction', { "dev", "superadmin", "admin", "mod", "user"}, function(xPlayer, args, showError)
-	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getFaction().name.. "^0 - ^5".. xPlayer.getFaction().grade_label .. "^0")
+	print(xPlayer.getFaction()..", You are currently: ^5".. xPlayer.getFaction().name.. "^0 - ^5".. xPlayer.getFaction().grade_label .. "^0")
 end, true)
 
 ESX.RegisterCommand('info', {"dev", "superadmin", "admin", "user"}, function(xPlayer, args, showError)
