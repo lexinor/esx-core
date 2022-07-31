@@ -10,7 +10,7 @@ Config.Accounts = {
 Config.StartingAccountMoney 	= {bank = 20000}
 
 Config.EnableSocietyPayouts 	= true -- pay from the society account that the player is employed at? Requirement: esx_society
-Config.EnableHud            	= true -- enable the default hud? Display current job and accounts (black, bank & cash)
+Config.EnableHud            	= false -- enable the default hud? Display current job and accounts (black, bank & cash)
 Config.MaxWeight            	= 24   -- the max inventory weight without backpack
 Config.PaycheckInterval         = 7 * 60000 -- how often to recieve pay checks in milliseconds
 Config.EnableDebug              = false -- Use Debug options?
@@ -19,14 +19,14 @@ Config.EnableWantedLevel    	= false -- Use Normal GTA wanted Level?
 Config.EnablePVP                = true -- Allow Player to player combat
 Config.NativeNotify             = false -- true = old esx notification
 
-Config.Multichar                = true -- Enable support for esx_multicharacter
+Config.Multichar                = false -- Enable support for esx_multicharacter
 Config.Identity                 = true -- Select a characters identity data before they have loaded in (this happens by default with multichar)
 Config.DistanceGive 			= 4.0 -- Max distance when giving items, weapons etc.
 Config.OnDuty                   = true -- Default state of the on duty system
-Config.DisableHealthRegen         = false -- Player will no longer regenerate health
+Config.DisableHealthRegen         = true -- Player will no longer regenerate health
 Config.DisableVehicleRewards      = true -- Disables Player Recieving weapons from vehicles
 Config.DisableNPCDrops            = true -- stops NPCs from dropping weapons on death
-Config.DisableWeaponWheel         = false -- Disables default weapon wheel
+Config.DisableWeaponWheel         = true -- Disables default weapon wheel
 Config.DisableAimAssist           = true -- disables AIM assist (mainly on controllers)
 Config.RemoveHudCommonents = {
 	[1] = true, --WANTED_STARS,
