@@ -1,4 +1,4 @@
-Locales['en'] = {
+Locales['fr'] = {
   ['show_active_character'] = 'Show Active Character',
   ['active_character'] = 'Active Character: %s',
   ['error_active_character'] = "There was an error obtaining your data.",
