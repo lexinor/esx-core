@@ -5,7 +5,7 @@ ESX.PlayerLoaded = false
 Core.CurrentRequestId = 0
 Core.ServerCallbacks = {}
 Core.TimeoutCallbacks = {}
-ESX.Input = {}
+Core.Input = {}
 ESX.UI = {}
 ESX.UI.HUD = {}
 ESX.UI.HUD.RegisteredElements = {}
@@ -84,21 +84,30 @@ function ESX.Progressbar(message, length, Options)
 end
 
 function ESX.ShowNotification(message, type, length)
-    if Config.NativeNotify then
-        BeginTextCommandThefeedPost('STRING')
-        AddTextComponentSubstringPlayerName(message)
-        EndTextCommandThefeedPostTicker(0, 1)
-    else
+    if GetResourceState("esx_notify") ~= "missing" then
         exports["esx_notify"]:Notify(type, length, message)
+        else
+            print("[ERROR] Missing esx_notify")
+        end
+    end
+    
+    
+function ESX.TextUI(message, type)
+    if GetResourceState("esx_textui") ~= "missing" then
+        exports["esx_textui"]:TextUI(message, type)
+    else 
+        print("[ERROR] Missing ESX TextUI!")
+        return
     end
 end
 
-function ESX.TextUI(message, type)
-    exports["esx_textui"]:TextUI(message, type)
-end
-
 function ESX.HideUI()
-    exports["esx_textui"]:HideUI()
+    if GetResourceState("esx_textui") ~= "missing" then
+        exports["esx_textui"]:HideUI()
+    else 
+        print("[ERROR] Missing ESX TextUI!")
+        return
+    end
 end
 
 function ESX.ShowAdvancedNotification(sender, subject, msg, textureDict, iconType, flash, saveToBrief, hudColorIndex)
@@ -140,7 +149,7 @@ ESX.HashString = function(str)
     local format = string.format
     local upper = string.upper
     local gsub = string.gsub
-    local hash = GetHashKey(str)
+    local hash = joaat(str)
     local input_map = format("~INPUT_%s~", upper(format("%x", hash)))
     input_map = string.gsub(input_map, "FFFFFFFF", "")
 
@@ -148,7 +157,6 @@ ESX.HashString = function(str)
 end
 
 if GetResourceState("esx_context") ~= "missing" then
-
     function ESX.OpenContext(...)
         exports["esx_context"]:Open(...)
     end
@@ -160,24 +168,32 @@ if GetResourceState("esx_context") ~= "missing" then
     function ESX.CloseContext(...)
         exports["esx_context"]:Close(...)
     end
+
+    function ESX.RefreshContext(...)
+       exports["esx_context"]:Refresh(...) 
+    end
 else 
     function ESX.OpenContext()
-        print("[ERROR] ESX Context Not Found")
+        print("[ERROR] Tried to open context menu, but esx_context is missing!")
     end
 
     function ESX.PreviewContext()
-        print("[ERROR] ESX Context Not Found")
+        print("[ERROR] Tried to preview context menu, but esx_context is missing!")
     end
 
     function ESX.CloseContext()
-        print("[ERROR] ESX Context Not Found")
+        print("[ERROR] Tried to close context menu, but esx_context is missing!")
+    end
+
+    function ESX.RefreshContext()
+        print("[ERROR] Tried to close context menu, but esx_context is missing!")
     end
 end
 
 
 ESX.RegisterInput = function(command_name, label, input_group, key, on_press, on_release)
     RegisterCommand(on_release ~= nil and "+" .. command_name or command_name, on_press)
-    ESX.Input[command_name] = on_release ~= nil and ESX.HashString("+" .. command_name) or ESX.HashString(command_name)
+    Core.Input[command_name] = on_release ~= nil and ESX.HashString("+" .. command_name) or ESX.HashString(command_name)
     if on_release then
         RegisterCommand("-" .. command_name, on_release)
     end
@@ -188,12 +204,7 @@ function ESX.TriggerServerCallback(name, cb, ...)
     Core.ServerCallbacks[Core.CurrentRequestId] = cb
 
     TriggerServerEvent('esx:triggerServerCallback', name, Core.CurrentRequestId, ...)
-
-    if Core.CurrentRequestId < 65535 then
-        Core.CurrentRequestId = Core.CurrentRequestId + 1
-    else
-        Core.CurrentRequestId = 0
-    end
+    Core.CurrentRequestId = Core.CurrentRequestId < 65535 and Core.CurrentRequestId + 1 or 0
 end
 
 function ESX.UI.HUD.SetDisplay(opacity)
@@ -403,23 +414,14 @@ function ESX.UI.ShowInventoryItemNotification(add, item, count)
 end
 
 function ESX.Game.GetPedMugshot(ped, transparent)
-    if DoesEntityExist(ped) then
-        local mugshot
+    if not DoesEntityExist(ped) then return end
+    local mugshot = transparent and RegisterPedheadshotTransparent(ped) or RegisterPedheadshot(ped)
 
-        if transparent then
-            mugshot = RegisterPedheadshotTransparent(ped)
-        else
-            mugshot = RegisterPedheadshot(ped)
-        end
-
-        while not IsPedheadshotReady(mugshot) do
-            Wait(0)
-        end
-
-        return mugshot, GetPedheadshotTxdString(mugshot)
-    else
-        return
+    while not IsPedheadshotReady(mugshot) do
+        Wait(0)
     end
+
+    return mugshot, GetPedheadshotTxdString(mugshot)
 end
 
 function ESX.Game.Teleport(entity, coords, cb)
@@ -442,18 +444,35 @@ function ESX.Game.Teleport(entity, coords, cb)
 end
 
 function ESX.Game.SpawnObject(object, coords, cb, networked)
-    local model = type(object) == 'number' and object or GetHashKey(object)
-    local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
     networked = networked == nil and true or networked
+    if networked then 
+        ESX.TriggerServerCallback('esx:Onesync:SpawnObject', function(NetworkID)
+            if cb then
+                local obj = NetworkGetEntityFromNetworkId(NetworkID)
+                local Tries = 0
+                while not DoesEntityExist(obj) do
+                    obj = NetworkGetEntityFromNetworkId(NetworkID)
+                    Wait(0)
+                    Tries += 1
+                    if Tries > 250 then
+                        break
+                    end
+                end
+                cb(obj)
+            end
+        end, object, coords, 0.0)
+    else 
+        local model = type(object) == 'number' and object or joaat(object)
+        local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
+        CreateThread(function()
+            ESX.Streaming.RequestModel(model)
 
-    CreateThread(function()
-        ESX.Streaming.RequestModel(model)
-
-        local obj = CreateObject(model, vector.xyz, networked, false, true)
-        if cb then
-            cb(obj)
-        end
-    end)
+            local obj = CreateObject(model, vector.xyz, networked, false, true)
+            if cb then
+                cb(obj)
+            end
+        end)
+    end
 end
 
 function ESX.Game.SpawnLocalObject(object, coords, cb)
@@ -461,7 +480,7 @@ function ESX.Game.SpawnLocalObject(object, coords, cb)
 end
 
 function ESX.Game.DeleteVehicle(vehicle)
-    SetEntityAsMissionEntity(vehicle, false, true)
+    SetEntityAsMissionEntity(vehicle, true, true)
     DeleteVehicle(vehicle)
 end
 
@@ -471,18 +490,18 @@ function ESX.Game.DeleteObject(object)
 end
 
 function ESX.Game.SpawnVehicle(vehicle, coords, heading, cb, networked)
-    local model = (type(vehicle) == 'number' and vehicle or GetHashKey(vehicle))
+    local model = type(vehicle) == 'number' and vehicle or joaat(vehicle)
     local vector = type(coords) == "vector3" and coords or vec(coords.x, coords.y, coords.z)
     networked = networked == nil and true or networked
     CreateThread(function()
         ESX.Streaming.RequestModel(model)
 
-        local vehicle = CreateVehicle(model, vector.xyz, heading, networked, false)
+        local vehicle = CreateVehicle(model, vector.xyz, heading, networked, true)
 
         if networked then
             local id = NetworkGetNetworkIdFromEntity(vehicle)
             SetNetworkIdCanMigrate(id, true)
-            SetEntityAsMissionEntity(vehicle, true, false)
+            SetEntityAsMissionEntity(vehicle, true, true)
         end
         SetVehicleHasBeenOwnedByPlayer(vehicle, true)
         SetVehicleNeedsToBeHotwired(vehicle, false)
@@ -548,6 +567,7 @@ function ESX.Game.GetPlayers(onlyOtherPlayers, returnKeyValue, returnPeds)
 
     return players
 end
+
 
 function ESX.Game.GetClosestObject(coords, modelFilter)
     return ESX.Game.GetClosestEntity(ESX.Game.GetObjects(), false, coords, modelFilter)
@@ -655,6 +675,12 @@ function ESX.Game.GetVehicleProperties(vehicle)
             customPrimaryColor = {r, g, b}
         end
 
+        local customXenonColorR, customXenonColorG, customXenonColorB = GetVehicleXenonLightsCustomColor(vehicle)
+        local customXenonColor = nil
+        if customXenonColorR and customXenonColorG and customXenonColorB then 
+            customXenonColor = {customXenonColorR, customXenonColorG, customXenonColorB}
+        end
+        
         local hasCustomSecondaryColor = GetIsVehicleSecondaryColourCustom(vehicle)
         local customSecondaryColor = nil
         if hasCustomSecondaryColor then
@@ -665,7 +691,7 @@ function ESX.Game.GetVehicleProperties(vehicle)
 
         for extraId = 0, 12 do
             if DoesExtraExist(vehicle, extraId) then
-                local state = IsVehicleExtraTurnedOn(vehicle, extraId) == 1
+                local state = IsVehicleExtraTurnedOn(vehicle, extraId)
                 extras[tostring(extraId)] = state
             end
         end
@@ -734,6 +760,7 @@ function ESX.Game.GetVehicleProperties(vehicle)
             wheels = GetVehicleWheelType(vehicle),
             windowTint = GetVehicleWindowTint(vehicle),
             xenonColor = GetVehicleXenonLightsColor(vehicle),
+            customXenonColor = customXenonColor,
 
             neonEnabled = {IsVehicleNeonLightEnabled(vehicle, 0), IsVehicleNeonLightEnabled(vehicle, 1),
                            IsVehicleNeonLightEnabled(vehicle, 2), IsVehicleNeonLightEnabled(vehicle, 3)},
@@ -790,7 +817,7 @@ function ESX.Game.GetVehicleProperties(vehicle)
             modTrimB = GetVehicleMod(vehicle, 44),
             modTank = GetVehicleMod(vehicle, 45),
             modDoorR = GetVehicleMod(vehicle, 47),
-            modLivery = GetVehicleLivery(vehicle),
+            modLivery = GetVehicleMod(vehicle, 48) == -1 and GetVehicleLivery(vehicle) or GetVehicleMod(vehicle, 48),
             modLightbar = GetVehicleMod(vehicle, 49)
         }
     else
@@ -874,6 +901,10 @@ function ESX.Game.SetVehicleProperties(vehicle, props)
         end
         if props.xenonColor then
             SetVehicleXenonLightsColor(vehicle, props.xenonColor)
+        end
+        if props.customXenonColor then
+            SetVehicleXenonLightsCustomColor(vehicle, props.customXenonColor[1], props.customXenonColor[2],
+                props.customXenonColor[3])
         end
         if props.modSmokeEnabled then
             ToggleVehicleMod(vehicle, 20, true)
@@ -1012,6 +1043,7 @@ function ESX.Game.SetVehicleProperties(vehicle, props)
         end
 
         if props.modLivery then
+            SetVehicleMod(vehicle, 48, props.modLivery, false)
             SetVehicleLivery(vehicle, props.modLivery)
         end
 
@@ -1074,16 +1106,16 @@ function ESX.ShowInventory()
     local playerPed = ESX.PlayerData.ped
     local elements, currentWeight = {}, 0
 
-    for k, v in pairs(ESX.PlayerData.accounts) do
-        if v.money > 0 then
-            local formattedMoney = _U('locale_currency', ESX.Math.GroupDigits(v.money))
-            local canDrop = v.name ~= 'bank'
+    for i=1, #(ESX.PlayerData.accounts) do
+        if ESX.PlayerData.accounts[i].money > 0 then
+            local formattedMoney = _U('locale_currency', ESX.Math.GroupDigits(ESX.PlayerData.accounts[i].money))
+            local canDrop = ESX.PlayerData.accounts[i].name ~= 'bank'
 
             table.insert(elements, {
-                label = ('%s: <span style="color:green;">%s</span>'):format(v.label, formattedMoney),
-                count = v.money,
+                label = ('%s: <span style="color:green;">%s</span>'):format(ESX.PlayerData.accounts[i].label, formattedMoney),
+                count = ESX.PlayerData.accounts[i].money,
                 type = 'item_account',
-                value = v.name,
+                value = ESX.PlayerData.accounts[i].name,
                 usable = false,
                 rare = false,
                 canRemove = canDrop
@@ -1108,7 +1140,7 @@ function ESX.ShowInventory()
     end
 
     for k, v in ipairs(Config.Weapons) do
-        local weaponHash = GetHashKey(v.name)
+        local weaponHash = joaat(v.name)
 
         if HasPedGotWeapon(playerPed, weaponHash, false) then
             local ammo, label = GetAmmoInPedWeapon(playerPed, weaponHash)
@@ -1304,7 +1336,7 @@ function ESX.ShowInventory()
             elseif data1.current.action == 'give_ammo' then
                 local closestPlayer, closestDistance = ESX.Game.GetClosestPlayer()
                 local closestPed = GetPlayerPed(closestPlayer)
-                local pedAmmo = GetAmmoInPedWeapon(playerPed, GetHashKey(item))
+                local pedAmmo = GetAmmoInPedWeapon(playerPed, joaat(item))
 
                 if IsPedOnFoot(closestPed) and not IsPedFalling(closestPed) then
                     if closestPlayer ~= -1 and closestDistance < 3.0 then

@@ -14,27 +14,27 @@ Core.PickupId = 0
 Core.PlayerFunctionOverrides = {}
 
 AddEventHandler('esx:getSharedObject', function(cb)
-	cb(ESX)
+  cb(ESX)
 end)
 
 exports('getSharedObject', function()
-	return ESX
+  return ESX
 end)
 
 if GetResourceState('ox_inventory') ~= 'missing' then
-	Config.OxInventory = true
-	Config.PlayerFunctionOverride = 'OxInventory'
-	SetConvarReplicated('inventory:framework', 'esx')
-	SetConvarReplicated('inventory:weight', Config.MaxWeight * 1000)
+  Config.OxInventory = true
+  Config.PlayerFunctionOverride = 'OxInventory'
+  SetConvarReplicated('inventory:framework', 'esx')
+  SetConvarReplicated('inventory:weight', Config.MaxWeight * 1000)
 end
 
 local function StartDBSync()
-	CreateThread(function()
-		while true do
-			Wait(10 * 60 * 1000)
-			Core.SavePlayers()
-		end
-	end)
+  CreateThread(function()
+    while true do
+      Wait(10 * 60 * 1000)
+      Core.SavePlayers()
+    end
+  end)
 end
 
 MySQL.ready(function()
@@ -55,37 +55,39 @@ MySQL.ready(function()
 			end
 		end)
 
-		AddEventHandler('ox_inventory:itemList', function(items)
-			ESX.Items = items
-		end)
+    AddEventHandler('ox_inventory:itemList', function(items)
+      ESX.Items = items
+    end)
 
-		while not next(ESX.Items) do Wait(0) end
-	end
+    while not next(ESX.Items) do
+      Wait(0)
+    end
+  end
 
-	local Jobs = {}
-	local jobs = MySQL.query.await('SELECT * FROM jobs')
+  local Jobs = {}
+  local jobs = MySQL.query.await('SELECT * FROM jobs')
 
-	for _, v in ipairs(jobs) do
-		Jobs[v.name] = v
-		Jobs[v.name].grades = {}
-	end
+  for _, v in ipairs(jobs) do
+    Jobs[v.name] = v
+    Jobs[v.name].grades = {}
+  end
 
-	local jobGrades = MySQL.query.await('SELECT * FROM job_grades')
+  local jobGrades = MySQL.query.await('SELECT * FROM job_grades')
 
-	for _, v in ipairs(jobGrades) do
-		if Jobs[v.job_name] then
-			Jobs[v.job_name].grades[tostring(v.grade)] = v
-		else
-			print(('[^3WARNING^7] Ignoring job grades for ^5"%s"^0 due to missing job'):format(v.job_name))
-		end
-	end
+  for _, v in ipairs(jobGrades) do
+    if Jobs[v.job_name] then
+      Jobs[v.job_name].grades[tostring(v.grade)] = v
+    else
+      print(('[^3WARNING^7] Ignoring job grades for ^5"%s"^0 due to missing job'):format(v.job_name))
+    end
+  end
 
-	for _, v in pairs(Jobs) do
-		if ESX.Table.SizeOf(v.grades) == 0 then
-			Jobs[v.name] = nil
-			print(('[^3WARNING^7] Ignoring job ^5"%s"^0 due to no job grades found'):format(v.name))
-		end
-	end
+  for _, v in pairs(Jobs) do
+    if ESX.Table.SizeOf(v.grades) == 0 then
+      Jobs[v.name] = nil
+      print(('[^3WARNING^7] Ignoring job ^5"%s"^0 due to no job grades found'):format(v.name))
+    end
+  end
 
 	if not Jobs then
 		-- Fallback data, if no jobs exist
@@ -157,16 +159,16 @@ end)
 
 RegisterServerEvent('esx:clientLog')
 AddEventHandler('esx:clientLog', function(msg)
-	if Config.EnableDebug then
-		print(('[^2TRACE^7] %s^7'):format(msg))
-	end
+  if Config.EnableDebug then
+    print(('[^2TRACE^7] %s^7'):format(msg))
+  end
 end)
 
 RegisterServerEvent('esx:triggerServerCallback')
 AddEventHandler('esx:triggerServerCallback', function(name, requestId, ...)
-	local playerId = source
+  local playerId = source
 
-	ESX.TriggerServerCallback(name, requestId, playerId, function(...)
-		TriggerClientEvent('esx:serverCallback', playerId, requestId, ...)
-	end, ...)
+  ESX.TriggerServerCallback(name, requestId, playerId, function(...)
+    TriggerClientEvent('esx:serverCallback', playerId, requestId, ...)
+  end, ...)
 end)

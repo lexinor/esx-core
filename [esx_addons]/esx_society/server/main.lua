@@ -72,15 +72,19 @@ end)
 
 RegisterServerEvent('esx_society:withdrawMoney')
 AddEventHandler('esx_society:withdrawMoney', function(societyName, amount)
-	local xPlayer = ESX.GetPlayerFromId(source)
+	local source = source
 	local society = GetSociety(societyName)
+	if not society then
+		print(('[^3WARNING^7] %s attempted to withdraw from non-existing society %s!'):format(xPlayer.getName(), societyName))
+		return
+	end
+	local xPlayer = ESX.GetPlayerFromId(source)
 	amount = ESX.Math.Round(tonumber(amount))
-
 	if (xPlayer.job.name == society.name) or (xPlayer.faction.name == society.name) then
 		TriggerEvent('esx_addonaccount:getSharedAccount', society.account, function(account)
 			if amount > 0 and account.money >= amount then
 				account.removeMoney(amount)
-				xPlayer.addMoney(amount)
+				xPlayer.addMoney(amount, "Society Withdraw")
 				xPlayer.showNotification(_U('have_withdrawn', ESX.Math.GroupDigits(amount)))
 			else
 				xPlayer.showNotification(_U('invalid_amount'))
@@ -93,14 +97,19 @@ end)
 
 RegisterServerEvent('esx_society:depositMoney')
 AddEventHandler('esx_society:depositMoney', function(societyName, amount)
+	local source = source
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local society = GetSociety(societyName)
+	if not society then
+		print(('[^3WARNING^7] %s attempted to deposit to non-existing society %s!'):format(xPlayer.getName(), societyName))
+		return
+	end
 	amount = ESX.Math.Round(tonumber(amount))
 
 	if (xPlayer.job.name == society.name) or (xPlayer.faction.name == society.name) then
 		if amount > 0 and xPlayer.getMoney() >= amount then
 			TriggerEvent('esx_addonaccount:getSharedAccount', society.account, function(account)
-				xPlayer.removeMoney(amount)
+				xPlayer.removeMoney(amount, "Society Deposit")
 				xPlayer.showNotification(_U('have_deposited', ESX.Math.GroupDigits(amount)))
 				account.addMoney(amount)
 			end)
@@ -114,13 +123,14 @@ end)
 
 RegisterServerEvent('esx_society:washMoney')
 AddEventHandler('esx_society:washMoney', function(society, amount)
+	local source = source
 	local xPlayer = ESX.GetPlayerFromId(source)
 	local account = xPlayer.getAccount('black_money')
 	amount = ESX.Math.Round(tonumber(amount))
 
 	if (xPlayer.job.name == society.name) or (xPlayer.faction.name == society.name) then
 		if amount and amount > 0 and account.money >= amount then
-			xPlayer.removeAccountMoney('black_money', amount)
+			xPlayer.removeAccountMoney('black_money', amount, "Washing")
 
 			MySQL.insert('INSERT INTO society_moneywash (identifier, society, amount) VALUES (?, ?, ?)', {xPlayer.identifier, society, amount},
 			function(rowsChanged)
@@ -136,8 +146,13 @@ end)
 
 RegisterServerEvent('esx_society:putVehicleInGarage')
 AddEventHandler('esx_society:putVehicleInGarage', function(societyName, vehicle)
+	local source = source
+	local xPlayer = ESX.GetPlayerFromId(source)
 	local society = GetSociety(societyName)
-
+	if not society then
+		print(('[^3WARNING^7] %s attempted to put a vehicle in a non-existing society - %s!'):format(xPlayer.getName(), societyName))
+		return
+	end
 	TriggerEvent('esx_datastore:getSharedDataStore', society.datastore, function(store)
 		local garage = store.get('garage') or {}
 		table.insert(garage, vehicle)
@@ -147,8 +162,13 @@ end)
 
 RegisterServerEvent('esx_society:removeVehicleFromGarage')
 AddEventHandler('esx_society:removeVehicleFromGarage', function(societyName, vehicle)
+	local source = source
+	local xPlayer = ESX.GetPlayerFromId(source)
 	local society = GetSociety(societyName)
-
+	if not society then
+		print(('[^3WARNING^7] %s attempted to Remove a vehicle in a non-existing society - %s!'):format(xPlayer.getName(), societyName))
+		return
+	end
 	TriggerEvent('esx_datastore:getSharedDataStore', society.datastore, function(store)
 		local garage = store.get('garage') or {}
 
@@ -165,7 +185,10 @@ end)
 
 ESX.RegisterServerCallback('esx_society:getSocietyMoney', function(source, cb, societyName)
 	local society = GetSociety(societyName)
-
+	if not society then
+		print(('[^3WARNING^7] Attempting To get a non-existing society - %s!'):format(societyName))
+		return
+	end
 	if society then
 		TriggerEvent('esx_addonaccount:getSharedAccount', society.account, function(account)
 			cb(account.money)
@@ -179,7 +202,6 @@ ESX.RegisterServerCallback('esx_society:getEmployees', function(source, cb, soci
 	local employees = {}
 
 	local Player = ESX.GetPlayerFromId(source)
-
 	if Player.job.name == society then
 		local xPlayers = ESX.GetExtendedPlayers('job', society)
 		for _, xPlayer in pairs(xPlayers) do
@@ -520,7 +542,8 @@ ESX.RegisterServerCallback('esx_society:getOnlinePlayers', function(source, cb)
 		getOnlinePlayers, onlinePlayers = true, {}
 		
 		local xPlayers = ESX.GetExtendedPlayers()
-		for _, xPlayer in pairs(xPlayers) do
+		for i=1, #(xPlayers) do 
+			local xPlayer = xPlayers[i]
 			table.insert(onlinePlayers, {
 				source = xPlayer.source,
 				identifier = xPlayer.identifier,
@@ -541,7 +564,10 @@ end)
 
 ESX.RegisterServerCallback('esx_society:getVehiclesInGarage', function(source, cb, societyName)
 	local society = GetSociety(societyName)
-
+	if not society then
+		print(('[^3WARNING^7] Attempting To get a non-existing society - %s!'):format(societyName))
+		return
+	end
 	TriggerEvent('esx_datastore:getSharedDataStore', society.datastore, function(store)
 		local garage = store.get('garage') or {}
 		cb(garage)

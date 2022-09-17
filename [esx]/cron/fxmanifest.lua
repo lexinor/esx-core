@@ -3,7 +3,7 @@ fx_version 'adamant'
 game 'gta5'
 author 'ESX-Framework'
 description 'cron'
-
-version '1.7.5'
+lua54 'yes'
+version '1.8.5'
 
 server_script 'server/main.lua'

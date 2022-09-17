@@ -35,19 +35,24 @@ ESX.RegisterCommand('car', { "dev", "superadmin", "admin"}, function(xPlayer, ar
 	if not args.car then args.car = GameBuild >= 2699 and "DRAUGUR" or "Prototipo" end
 	xPlayer.triggerEvent('esx:spawnVehicle', args.car)
 end, false, {help = _U('command_car'), validate = false, arguments = {
-	{name = 'car', help = _U('command_car_car'), type = 'any'}
+	{name = 'car',validate = false, help = _U('command_car_car'), type = 'string'}
 }}) 
 
 ESX.RegisterCommand({'cardel', 'dv'}, { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
-	if not args.radius then args.radius = 4 end
-	xPlayer.triggerEvent('esx:deleteVehicle', args.radius)
+	local Vehicles = ESX.OneSync.GetVehiclesInArea(xPlayer.getCoords(true), tonumber(args.radius) or 4)
+	for i=1, #Vehicles do 
+		local Vehicle = NetworkGetEntityFromNetworkId(Vehicles[i])
+		if DoesEntityExist(Vehicle) then
+			DeleteEntity(Vehicle)
+		end
+	end
 end, false, {help = _U('command_cardel'), validate = false, arguments = {
-	{name = 'radius', help = _U('command_cardel_radius'), type = 'any'}
+	{name = 'radius',validate = false, help = _U('command_cardel_radius'), type = 'number'}
 }})
 
 ESX.RegisterCommand('setaccountmoney', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if args.playerId.getAccount(args.account) then
-		args.playerId.setAccountMoney(args.account, args.amount)
+		args.playerId.setAccountMoney(args.account, args.amount, "Government Grant")
 	else
 		showError(_U('command_giveaccountmoney_invalid'))
 	end
@@ -59,7 +64,7 @@ end, true, {help = _U('command_setaccountmoney'), validate = true, arguments = {
 
 ESX.RegisterCommand('giveaccountmoney', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if args.playerId.getAccount(args.account) then
-		args.playerId.addAccountMoney(args.account, args.amount)
+		args.playerId.addAccountMoney(args.account, args.amount, "Government Grant")
 	else
 		showError(_U('command_giveaccountmoney_invalid'))
 	end
@@ -239,7 +244,8 @@ end, false)
 ESX.RegisterCommand('players', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	local xPlayers = ESX.GetExtendedPlayers() -- Returns all xPlayers
 	print("^5"..#xPlayers.." ^2online player(s)^0")
-	for _, xPlayer in pairs(xPlayers) do
+	for i=1, #(xPlayers) do 
+		local xPlayer = xPlayers[i]
 		print("^1[ ^2ID : ^5"..xPlayer.source.." ^0| ^2Name : ^5"..xPlayer.getName().." ^0 | ^2Group : ^5"..xPlayer.getGroup().." ^0 | ^2Identifier : ^5".. xPlayer.identifier .."^1]^0\n")
 	end
 end, true)
