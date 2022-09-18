@@ -22,8 +22,8 @@ Config.Raiding = {
   CanAdminsRaid = true, -- Can Admins Raid Houses Default: true
   ItemRequired = { -- Item Required to Raid -- Remove To Disable
     RemoveItem = true, -- Remove Item from Inventory Default: true
-    name = "bread", -- Item Name Default: "bread"
-    label = "Bread", -- Item label Default: "Bread"
+    name = "ram", -- Item Name Default: "bread"
+    label = "Ram", -- Item label Default: "Bread"
     ItemCount = 1,   -- Item Count Default: 1
   },
   Animation = {
@@ -104,6 +104,8 @@ Config.CCTV = {
 -------- Groups allowed to use Admin Functions -------------------
 Config.AllowedGroups = {
   -- Note: Superadmin is not a group In ESX
+  "dev",
+  "superadmin",
   "admin"
 }
 
@@ -136,7 +138,7 @@ end
 
 --------------------- Real Estate Settings ----------
 Config.PlayerManagement = {                          
-  Enabled = false, -- Enable/Disable Player Management Default: true
+  Enabled = true, -- Enable/Disable Player Management Default: true
   job = "realestateagent", -- Job Required to Manage Players Default: "realestateagent"                 
   joblabel = "Estate Agent", -- Job Label Default: "Estate Agent"          
   society = "society_realestateagent", -- Society Required to Manage Players Default: "society_realestateagent"
@@ -162,22 +164,22 @@ Config.PlayerManagement = {
     },
   },
   Permissions = { -- Minimum Grade Required for Action
-    CreateProperty = 0, -- Create Property
+    CreateProperty = 2, -- Create Property
     DeleteProperty = 2, -- Delete Property
     ViewProperties = 0, -- View All Properties
     SellProperty = 0, -- Sell Property to players
-    ToggleCCTV = 1, -- Change CCTV settings
-    ToggleLock = 0, -- Change Lock Settings
+    ToggleCCTV = 2, -- Change CCTV settings
+    ToggleLock = 1, -- Change Lock Settings
     ToggleGarage = 1, -- Change Garage Settings
-    SetPropertyName =1, -- Change Property Name
+    SetPropertyName = 2, -- Change Property Name
     RemovePropertyName = 1, -- Remove Property Name
-    SetPropertyPrice = 0, -- Change Property Price
+    SetPropertyPrice = 2, -- Change Property Price
     ChangeInterior = 1, -- Change Interior
     ResetFurniture = 0, -- Reset Furniture
-    EvictOwner = 0,   -- Evict Owners
-    ChangeEntrance = 0,  -- Change Entrance
-    EditInteriorPositions = 1,  -- Edit Interior Positions
-    ManagePropertiesFromQuickActions = 1, -- Manage Properties From Quick Actions (F6)
+    EvictOwner = 1,   -- Evict Owners
+    ChangeEntrance = 1,  -- Change Entrance
+    EditInteriorPositions = 2,  -- Edit Interior Positions
+    ManagePropertiesFromQuickActions = 2, -- Manage Properties From Quick Actions (F6)
   },
   Locations = {
     Entrance = vector3( -199.151, -575.000,  39.489 ), -- Entrance Location Default: vector3( -199.151, -575.000,  39.489 )
