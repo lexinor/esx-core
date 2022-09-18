@@ -245,22 +245,19 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
   end
 
-    -- Group
-    if result.group then
-        if result.group == "dev" then
-            userData.group = "dev"
-        elseif result.group == "superadmin" then
-            userData.group = "superadmin"
-        elseif result.group == "admin" then
-            userData.group = "admin"
-        elseif result.group == "mod" then
-            userData.group = "mod"
-        else
-            userData.group = result.group
-        end
-    else
-      userData.group = result.group
-    end
+  -- Group
+  if result.group then
+      if result.group == "dev" then
+          userData.group = "dev"
+      elseif result.group == "superadmin" then
+          userData.group = "superadmin"
+      elseif result.group == "admin" then
+          userData.group = "admin"
+      elseif result.group == "mod" then
+          userData.group = "mod"
+      else
+          userData.group = result.group
+      end
   else
     userData.group = 'user'
   end
@@ -691,7 +688,12 @@ AddEventHandler('txAdmin:events:serverShuttingDown', function()
   Core.SavePlayers()
 end)
 
-
+RegisterNetEvent('esx:setDuty')
+AddEventHandler('esx:setDuty', function(bool)
+    local xPlayer = ESX.GetPlayerFromId(source)
+    if xPlayer.job.onDuty == bool then
+        return
+    end
     if bool then
         xPlayer.setDuty(true)
         xPlayer.triggerEvent('esx:showNotification', _U('started_duty'))
