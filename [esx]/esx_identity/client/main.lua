@@ -43,8 +43,10 @@ if not Config.UseDeferrals then
     end
 
     RegisterNetEvent('esx_identity:showRegisterIdentity', function()
-        TriggerEvent('esx_skin:resetFirstSpawn')
-
+        if Config.PELoadingScreen then
+            exports["pe-basicloading"]:shutdown()
+        end        
+        TriggerEvent('esx_skin:resetFirstSpawn')        
         if not ESX.PlayerData.dead then EnableGui(true) end
     end)
 
@@ -56,7 +58,7 @@ if not Config.UseDeferrals then
                 if not ESX.GetConfig().Multichar then 
                     TriggerEvent('esx_skin:playerRegistered') 
                 end 
-                TriggerEvent('esx_skin:openSaveableMenu', function() 
+                TriggerEvent('esx_skin:openRegisterMenu', function() 
                     finished = true
                 end, function() 
                     finished = true 

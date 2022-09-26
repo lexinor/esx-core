@@ -21,3 +21,5 @@ Config.HighestYear      = 2003 -- 18 years old is the youngest you can be.
 
 Config.FullCharDelete   = true -- Delete all reference to character.
 Config.EnableDebugging  = ESX.GetConfig().EnableDebug -- prints for debugging :)
+
+Config.PELoadingScreen = true
