@@ -1,17 +1,17 @@
 Config = {}
-Config.Locale = 'fr'
+Config.Locale = GetConvar('esx:locale', 'fr')
 
 Config.Accounts = {
 	bank = {
-		label = _U('account_bank'),
+		label = TranslateCap('account_bank'),
 		round = true
 	},
 	black_money = {
-		label = _U('account_black_money'),
+		label = TranslateCap('account_black_money'),
 		round = true
 	},
 	money = {
-		label = _U('account_money'),
+		label = TranslateCap('account_money'),
 		round = true
 	}
 }
@@ -31,7 +31,7 @@ Config.Multichar                = false -- Enable support for esx_multicharacter
 Config.Identity                 = true -- Select a characters identity data before they have loaded in (this happens by default with multichar)
 Config.DistanceGive 			= 4.0 -- Max distance when giving items, weapons etc.
 Config.OnDuty                   = true -- Default state of the on duty system
-Config.DisableHealthRegen         = true -- Player will no longer regenerate health
+Config.DisableHealthRegeneration  = true -- Player will no longer regenerate health
 Config.DisableVehicleRewards      = true -- Disables Player Recieving weapons from vehicles
 Config.DisableNPCDrops            = true -- stops NPCs from dropping weapons on death
 Config.DisableWeaponWheel         = true -- Disables default weapon wheel

@@ -1,5 +1,5 @@
 Config                  = {}
-Config.Locale           = 'fr'
+Config.Locale = GetConvar('esx:locale', 'fr')
 
 -- [Config.EnableCommands]
 -- Enables Commands Such As /char and /chardel

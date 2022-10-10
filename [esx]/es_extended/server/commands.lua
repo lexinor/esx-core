@@ -1,21 +1,26 @@
 ESX.RegisterCommand('setcoords', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	xPlayer.setCoords({x = args.x, y = args.y, z = args.z})
-end, false, {help = _U('command_setcoords'), validate = true, arguments = {
-	{name = 'x', help = _U('command_setcoords_x'), type = 'number'},
-	{name = 'y', help = _U('command_setcoords_y'), type = 'number'},
-	{name = 'z', help = _U('command_setcoords_z'), type = 'number'}
+end, false, {help = TranslateCap('command_setcoords'), validate = true, arguments = {
+	{name = 'x', help = TranslateCap('command_setcoords_x'), type = 'number'},
+	{name = 'y', help = TranslateCap('command_setcoords_y'), type = 'number'},
+	{name = 'z', help = TranslateCap('command_setcoords_z'), type = 'number'}
 }})
 
 ESX.RegisterCommand('setjob', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if ESX.DoesJobExist(args.job, args.grade) then
 		args.playerId.setJob(args.job, args.grade)
 	else
-		showError(_U('command_setjob_invalid'))
+		showError(TranslateCap('command_setjob_invalid'))
 	end
-end, true, {help = _U('command_setjob'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-	{name = 'job', help = _U('command_setjob_job'), type = 'string'},
-	{name = 'grade', help = _U('command_setjob_grade'), type = 'number'}
+	ESX.DiscordLogFields("UserActions", "/setjob Triggered", "pink", {
+		{name = "Player", value = xPlayer.name, inline = true},
+		{name = "Job", value = args.job, inline = true},
+    {name = "Grade", value = args.grade, inline = true}
+	})
+end, true, {help = TranslateCap('command_setjob'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+	{name = 'job', help = TranslateCap('command_setjob_job'), type = 'string'},
+	{name = 'grade', help = TranslateCap('command_setjob_grade'), type = 'number'}
 }})
 
 ESX.RegisterCommand('setfaction', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
@@ -32,10 +37,15 @@ end, true, {help = 'Commande setfaction', validate = true, arguments = {
 
 ESX.RegisterCommand('car', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	local GameBuild = tonumber(GetConvar("sv_enforceGameBuild", 1604))
-	if not args.car then args.car = GameBuild >= 2699 and "DRAUGUR" or "Prototipo" end
+	if not args.car then args.car = GameBuild >= 2699 and "draugur" or "prototipo" end
+	ESX.DiscordLogFields("UserActions", "/car Triggered", "pink", {
+		{name = "Player", value = xPlayer.name, inline = true},
+		{name = "ID", value = xPlayer.source, inline = true},
+    {name = "Vehicle", value = args.car, inline = true}
+	})
 	xPlayer.triggerEvent('esx:spawnVehicle', args.car)
-end, false, {help = _U('command_car'), validate = false, arguments = {
-	{name = 'car',validate = false, help = _U('command_car_car'), type = 'string'}
+end, false, {help = TranslateCap('command_car'), validate = false, arguments = {
+	{name = 'car',validate = false, help = TranslateCap('command_car_car'), type = 'string'}
 }}) 
 
 ESX.RegisterCommand({'cardel', 'dv'}, { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
@@ -46,53 +56,65 @@ ESX.RegisterCommand({'cardel', 'dv'}, { "dev", "superadmin", "admin"}, function(
 			DeleteEntity(Vehicle)
 		end
 	end
-end, false, {help = _U('command_cardel'), validate = false, arguments = {
-	{name = 'radius',validate = false, help = _U('command_cardel_radius'), type = 'number'}
+end, false, {help = TranslateCap('command_cardel'), validate = false, arguments = {
+	{name = 'radius',validate = false, help = TranslateCap('command_cardel_radius'), type = 'number'}
 }})
 
 ESX.RegisterCommand('setaccountmoney', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if args.playerId.getAccount(args.account) then
 		args.playerId.setAccountMoney(args.account, args.amount, "Government Grant")
 	else
-		showError(_U('command_giveaccountmoney_invalid'))
+		showError(TranslateCap('command_giveaccountmoney_invalid'))
 	end
-end, true, {help = _U('command_setaccountmoney'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-	{name = 'account', help = _U('command_giveaccountmoney_account'), type = 'string'},
-	{name = 'amount', help = _U('command_setaccountmoney_amount'), type = 'number'}
+end, true, {help = TranslateCap('command_setaccountmoney'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+	{name = 'account', help = TranslateCap('command_giveaccountmoney_account'), type = 'string'},
+	{name = 'amount', help = TranslateCap('command_setaccountmoney_amount'), type = 'number'}
 }})
 
 ESX.RegisterCommand('giveaccountmoney', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if args.playerId.getAccount(args.account) then
 		args.playerId.addAccountMoney(args.account, args.amount, "Government Grant")
 	else
-		showError(_U('command_giveaccountmoney_invalid'))
+		showError(TranslateCap('command_giveaccountmoney_invalid'))
 	end
-end, true, {help = _U('command_giveaccountmoney'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-	{name = 'account', help = _U('command_giveaccountmoney_account'), type = 'string'},
-	{name = 'amount', help = _U('command_giveaccountmoney_amount'), type = 'number'}
+end, true, {help = TranslateCap('command_giveaccountmoney'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+	{name = 'account', help = TranslateCap('command_giveaccountmoney_account'), type = 'string'},
+	{name = 'amount', help = TranslateCap('command_giveaccountmoney_amount'), type = 'number'}
 }})
 
 if not Config.OxInventory then
 	ESX.RegisterCommand('giveitem', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 		args.playerId.addInventoryItem(args.item, args.count)
-	end, true, {help = _U('command_giveitem'), validate = true, arguments = {
-		{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-		{name = 'item', help = _U('command_giveitem_item'), type = 'item'},
-		{name = 'count', help = _U('command_giveitem_count'), type = 'number'}
+	end, true, {help = TranslateCap('command_giveitem'), validate = true, arguments = {
+		{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+		{name = 'item', help = TranslateCap('command_giveitem_item'), type = 'item'},
+		{name = 'count', help = TranslateCap('command_giveitem_count'), type = 'number'}
 	}})
 
 	ESX.RegisterCommand('giveweapon', 'admin', function(xPlayer, args, showError)
 		if args.playerId.hasWeapon(args.weapon) then
-			showError(_U('command_giveweapon_hasalready'))
+			showError(TranslateCap('command_giveweapon_hasalready'))
 		else
 			args.playerId.addWeapon(args.weapon, args.ammo)
 		end
-	end, true, {help = _U('command_giveweapon'), validate = true, arguments = {
-		{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-		{name = 'weapon', help = _U('command_giveweapon_weapon'), type = 'weapon'},
-		{name = 'ammo', help = _U('command_giveweapon_ammo'), type = 'number'}
+	end, true, {help = TranslateCap('command_giveweapon'), validate = true, arguments = {
+		{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+		{name = 'weapon', help = TranslateCap('command_giveweapon_weapon'), type = 'weapon'},
+		{name = 'ammo', help = TranslateCap('command_giveweapon_ammo'), type = 'number'}
+	}})
+
+	ESX.RegisterCommand('giveammo', 'admin', function(xPlayer, args, showError)
+		if args.playerId.hasWeapon(args.weapon) then
+			args.playerId.addWeaponAmmo(args.weapon, args.ammo)   
+		else
+			showError(TranslateCap("command_giveammo_noweapon_found"))
+		end
+	end, true, {help = TranslateCap('command_giveweapon'), validate = false, arguments = {
+		{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+		{name = 'weapon', help = TranslateCap('command_giveammo_weapon'), type = 'weapon'},
+		{name = 'ammo', help = TranslateCap('command_giveammo_ammo'), type = 'number'}
 	}})
 
 	ESX.RegisterCommand('giveweaponcomponent', { "dev", "superadmin"}, function(xPlayer, args, showError)
@@ -101,34 +123,34 @@ if not Config.OxInventory then
 
 			if component then
 				if args.playerId.hasWeaponComponent(args.weaponName, args.componentName) then
-					showError(_U('command_giveweaponcomponent_hasalready'))
+					showError(TranslateCap('command_giveweaponcomponent_hasalready'))
 				else
 					args.playerId.addWeaponComponent(args.weaponName, args.componentName)
 				end
 			else
-				showError(_U('command_giveweaponcomponent_invalid'))
+				showError(TranslateCap('command_giveweaponcomponent_invalid'))
 			end
 		else
-			showError(_U('command_giveweaponcomponent_missingweapon'))
+			showError(TranslateCap('command_giveweaponcomponent_missingweapon'))
 		end
-	end, true, {help = _U('command_giveweaponcomponent'), validate = true, arguments = {
-		{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-		{name = 'weaponName', help = _U('command_giveweapon_weapon'), type = 'weapon'},
-		{name = 'componentName', help = _U('command_giveweaponcomponent_component'), type = 'string'}
+	end, true, {help = TranslateCap('command_giveweaponcomponent'), validate = true, arguments = {
+		{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+		{name = 'weaponName', help = TranslateCap('command_giveweapon_weapon'), type = 'weapon'},
+		{name = 'componentName', help = TranslateCap('command_giveweaponcomponent_component'), type = 'string'}
 	}})
 end
 
 ESX.RegisterCommand({'clear', 'cls'}, 'user', function(xPlayer, args, showError)
 	xPlayer.triggerEvent('chat:clear')
-end, false, {help = _U('command_clear')})
+end, false, {help = TranslateCap('command_clear')})
 
 ESX.RegisterCommand({'clearall', 'clsall'}, { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	TriggerClientEvent('chat:clear', -1)
-end, true, {help = _U('command_clearall')})
+end, true, {help = TranslateCap('command_clearall')})
 
 ESX.RegisterCommand("refreshjobs", { "dev", "superadmin"}, function(xPlayer, args, showError)
 	ESX.RefreshJobs()
-end, true, {help = _U('command_clearall')})
+end, true, {help = TranslateCap('command_clearall')})
 
 if not Config.OxInventory then
 	ESX.RegisterCommand('clearinventory', 'admin', function(xPlayer, args, showError)
@@ -138,8 +160,8 @@ if not Config.OxInventory then
 			end
 		end
 		TriggerEvent('esx:playerInventoryCleared',args.playerId)
-	end, true, {help = _U('command_clearinventory'), validate = true, arguments = {
-		{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+	end, true, {help = TranslateCap('command_clearinventory'), validate = true, arguments = {
+		{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 	}})
 
 	ESX.RegisterCommand('clearloadout', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
@@ -147,8 +169,8 @@ if not Config.OxInventory then
 			args.playerId.removeWeapon(args.playerId.loadout[i].name)
 		end
 		TriggerEvent('esx:playerLoadoutCleared',args.playerId)
-	end, true, {help = _U('command_clearloadout'), validate = true, arguments = {
-		{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+	end, true, {help = TranslateCap('command_clearloadout'), validate = true, arguments = {
+		{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 	}})
 end
 
@@ -159,21 +181,21 @@ ESX.RegisterCommand('setgroup', { "dev", "superadmin", "admin"}, function(xPlaye
 	if args.group == "admin" then args.group = "admin" end
 	if args.group == "mod" then args.group = "mod" end
 	args.playerId.setGroup(args.group)
-end, true, {help = _U('command_setgroup'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-	{name = 'group', help = _U('command_setgroup_group'), type = 'string'},
+end, true, {help = TranslateCap('command_setgroup'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'},
+	{name = 'group', help = TranslateCap('command_setgroup_group'), type = 'string'},
 }})
 
 ESX.RegisterCommand('save', { "dev", "superadmin"}, function(xPlayer, args, showError)
 	Core.SavePlayer(args.playerId)
-	print("[^2Info^0] Saved Player!")
-end, true, {help = _U('command_save'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+	print("[^2Info^0] Saved Player - ^5".. args.playerId.source .. "^0")
+end, true, {help = TranslateCap('command_save'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
 ESX.RegisterCommand('saveall', { "dev", "superadmin"}, function(xPlayer, args, showError)
 	Core.SavePlayers()
-end, true, {help = _U('command_saveall')})
+end, true, {help = TranslateCap('command_saveall')})
 
 ESX.RegisterCommand('group', { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)
 	print(xPlayer.getName()..", You are currently: ^5".. xPlayer.getGroup() .. "^0")
@@ -208,33 +230,33 @@ end, true)
 ESX.RegisterCommand('goto', { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)
 	local targetCoords = args.playerId.getCoords()
 	xPlayer.setCoords(targetCoords)
-end, true, {help = _U('command_goto'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+end, true, {help = TranslateCap('command_goto'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
 ESX.RegisterCommand('bring', { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)
 	local playerCoords = xPlayer.getCoords()
 	args.playerId.setCoords(playerCoords)
-end, true, {help = _U('command_bring'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+end, true, {help = TranslateCap('command_bring'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
 ESX.RegisterCommand('kill', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	args.playerId.triggerEvent("esx:killPlayer")
-end, true, {help = _U('command_kill'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+end, true, {help = TranslateCap('command_kill'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
 ESX.RegisterCommand('freeze', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	args.playerId.triggerEvent('esx:freezePlayer', "freeze")
-end, true, {help = _U('command_freeze'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+end, true, {help = TranslateCap('command_freeze'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
 ESX.RegisterCommand('unfreeze', { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)
 	args.playerId.triggerEvent('esx:freezePlayer', "unfreeze")
-end, true, {help = _U('command_unfreeze'), validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'}
+end, true, {help = TranslateCap('command_unfreeze'), validate = true, arguments = {
+	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
 ESX.RegisterCommand("noclip", { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)

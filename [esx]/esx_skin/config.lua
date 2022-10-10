@@ -1,6 +1,6 @@
 Config = {}
 
-Config.Locale = 'fr'
+Config.Locale = GetConvar('esx:locale', 'fr')
 
 Config.BackpackWeight = {
 	[40] = 16, 
