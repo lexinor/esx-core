@@ -195,7 +195,6 @@ function loadESXPlayer(identifier, playerId, isNew)
     userData.faction.grade_name = gradefObject.name
     userData.faction.grade_label = gradefObject.label
     userData.faction.grade_salary = gradefObject.salary
-    userData.faction.onDuty = Config.OnDuty
 
     userData.faction.skin_male = {}
     userData.faction.skin_female = {}
@@ -690,22 +689,6 @@ end)
 
 AddEventHandler('txAdmin:events:serverShuttingDown', function()
   Core.SavePlayers()
-end)
-
-RegisterNetEvent('esx:setDuty')
-AddEventHandler('esx:setDuty', function(bool)
-    local xPlayer = ESX.GetPlayerFromId(source)
-    if xPlayer.job.onDuty == bool then
-        return
-    end
-    if bool then
-        xPlayer.setDuty(true)
-        xPlayer.triggerEvent('esx:showNotification', _U('started_duty'))
-    else
-        xPlayer.setDuty(false)
-        xPlayer.triggerEvent('esx:showNotification', _U('stopped_duty'))
-    end
-    TriggerClientEvent('esx:setJob', xPlayer.source, xPlayer.job)
 end)
 
 RegisterNetEvent('lexinor:updateLastConnection')

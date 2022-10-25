@@ -30,7 +30,6 @@ Config.EnablePVP                = true -- Allow Player to player combat
 Config.Multichar                = false -- Enable support for esx_multicharacter
 Config.Identity                 = true -- Select a characters identity data before they have loaded in (this happens by default with multichar)
 Config.DistanceGive 			= 4.0 -- Max distance when giving items, weapons etc.
-Config.OnDuty                   = true -- Default state of the on duty system
 Config.DisableHealthRegeneration  = true -- Player will no longer regenerate health
 Config.DisableVehicleRewards      = true -- Disables Player Recieving weapons from vehicles
 Config.DisableNPCDrops            = true -- stops NPCs from dropping weapons on death

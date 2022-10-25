@@ -393,7 +393,6 @@ function ESX.RefreshFactions()
 					grade = 0,
 					label = 'Sans faction',
 					salary = 0,
-                    onDuty = false,
 					skin_male = {},
 					skin_female = {}
 				}
