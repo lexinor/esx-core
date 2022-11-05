@@ -103,14 +103,14 @@ if Config.Furniture.Enabled then
       PushScaleformMovieFunctionParameterInt(5)
       N_0xe83a3e3557a56640(GetControlInstructionalButton(1, Config.Furniture.Controls.Up, true))
       N_0xe83a3e3557a56640(GetControlInstructionalButton(1, Config.Furniture.Controls.Down, true))
-      InstructionButtonMessage(TranslateCap("Height"))
+      InstructionButtonMessage(TranslateCap("height"))
       PopScaleformMovieFunctionVoid()
 
       PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
       PushScaleformMovieFunctionParameterInt(7)
       N_0xe83a3e3557a56640(GetControlInstructionalButton(1, Config.Furniture.Controls.RotateLeft, true))
       N_0xe83a3e3557a56640(GetControlInstructionalButton(1, Config.Furniture.Controls.RotateRight, true))
-      InstructionButtonMessage(TranslateCap("Rotation"))
+      InstructionButtonMessage(TranslateCap("rotate"))
       PopScaleformMovieFunctionVoid()
 
       PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
@@ -267,7 +267,7 @@ if Config.Furniture.Enabled then
                    {title = TranslateCap("back"), value = "go-back", icon = "fas fa-arrow-left"}}
 
     for k, v in pairs(Config.FurnitureCatagories[Catagory]) do
-      table.insert(Items, {title = v.title, value = v.name, index = k, description = "Price: " .. v.price, icon = "fas fa-shopping-cart"})
+      table.insert(Items, {title = v.title, value = v.name, index = k, description = _U("price", v.price), icon = "fas fa-shopping-cart"})
     end
 
     ESX.OpenContext("right", Items, function(data, element)

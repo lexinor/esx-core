@@ -196,9 +196,17 @@ end)
 AddStateBagChangeHandler('VehicleProperties', nil, function(bagName, key, value)
 	if value then
 			Wait(0)
-			local NetId = tonumber(bagName:gsub('entity:', ''), 10)
+			local NetId = value.NetId
 			local Vehicle = NetworkGetEntityFromNetworkId(NetId)
-
+			local Tries = 0
+			while not DoesEntityExist(Vehicle) do
+				local Vehicle = NetworkGetEntityFromNetworkId(NetId)
+				Wait(100)
+				Tries = Tries + 1
+				if Tries > 300 then
+					break
+				end
+			end
 			if NetworkGetEntityOwner(Vehicle) == PlayerId() then
 					ESX.Game.SetVehicleProperties(Vehicle, value)
 			end
@@ -746,6 +754,30 @@ AddEventHandler("esx:freezePlayer", function(input)
         SetPlayerInvincible(player, false)
     end
 end)
+
+RegisterNetEvent("esx:GetVehicleType", function(Model, Request)
+	local Model = Model
+	local VehicleType = GetVehicleClassFromName(Model)
+	local type = "automobile"
+	if VehicleType == 15 then
+		type = "heli"
+	elseif VehicleType == 16 then
+		type = "plane"
+	elseif VehicleType == 14 then
+		type = "boat"
+	elseif VehicleType == 11 then
+		type = "trailer"
+	elseif VehicleType == 21 then
+		type = "train"
+	elseif VehicleType == 13 or VehicleType == 8 then
+		type = "bike"
+	end
+	if Model == `submersible` or Model == `submersible2` then
+		type = "submarine"
+	end
+	TriggerServerEvent("esx:ReturnVehicleType", type, Request)
+end)
+
 
 local DoNotUse = {
 	'essentialmode',
