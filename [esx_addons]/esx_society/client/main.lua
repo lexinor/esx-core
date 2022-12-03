@@ -122,6 +122,8 @@ function OpenBossMenu(society, close, options)
 						{icon = "fas fa-wallet", title = "Amount", input = true, inputType = "number", inputPlaceholder = "Amount to withdraw..", inputMin = 1, inputMax = 250000, name = "withdraw"},
 						{icon = "fas fa-check", title = "Confirm", value = "confirm"},
 						{icon = "fas fa-arrow-left", title = "Return", value = "return"}
+						{icon = "fas fa-check", title = "Confirm", value = "confirm"},
+						{icon = "fas fa-arrow-left", title = "Return", value = "return"}
 					}
 					ESX.RefreshContext(elements)
 				elseif element.value == "confirm" then
@@ -185,6 +187,9 @@ function OpenManageEmployeesMenu(society, options)
 		{icon = "fas fa-users", title = TranslateCap('employee_list'), value = "employee_list"},
 		{icon = "fas fa-users", title = TranslateCap('recruit'), value = "recruit"}
 	}
+	
+	elements[#elements+1] = {icon = "fas fa-arrow-left", title = "Return", value = "return"}
+	
 
 	elements[#elements+1] = {icon = "fas fa-arrow-left", title = "Return", value = "return"}
 
@@ -192,7 +197,7 @@ function OpenManageEmployeesMenu(society, options)
 		if element.value == "employee_list" then
 			OpenEmployeeList(society, options)
 		elseif element.value == "recruit" then
-			OpenRecruitMenu(society, options)
+			OpenRecruitMenu(society, options)	
 		elseif element.value == "return" then
 			OpenBossMenu(society, nil, options)
 		end
@@ -240,9 +245,9 @@ function OpenEmployeeList(society, options)
 					elseif element2.value == "fire" then
 						ESX.ShowNotification(TranslateCap('you_have_fired', employee.name))
 
-						ESX.TriggerServerCallback('esx_society:'..event, function()
+						ESX.TriggerServerCallback('esx_society:setJob', function()
 							OpenEmployeeList(society, options)
-						end, employee.identifier, selected, 0, 'fire')
+						end, employee.identifier, 'unemployed', 0, 'fire')
 					elseif element2.value == "return" then
 						OpenEmployeeList(society, options)
 					end
