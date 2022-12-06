@@ -74,7 +74,7 @@ AddEventHandler('esx:playerLoaded', function(xPlayer, isNew, skin)
 					DisabledComps[#DisabledComps + 1] = i
 				end
 		 end
-			while true do 
+			while true do
 				local Sleep = true
 
 				if Config.DisableHealthRegeneration then
@@ -344,7 +344,7 @@ AddEventHandler('esx:spawnVehicle', function(vehicle)
 					SetEntityAsMissionEntity(vehicle, true, true) -- Persistant Vehicle
 
 					-- Max out vehicle upgrades
-					if Config.MaxAdminVehicles then 
+					if Config.MaxAdminVehicles then
 						SetVehicleExplodesOnHighExplosionDamage(vehicle, true)
 						SetVehicleModKit(vehicle, 0)
 						SetVehicleMod(vehicle, 11, 3, false) -- modEngine
@@ -469,20 +469,20 @@ function StartServerSyncLoops()
 						if GetSelectedPedWeapon(ESX.PlayerData.ped) ~= -1569615261 then
 							sleep = 1000
 							local _,weaponHash = GetCurrentPedWeapon(ESX.PlayerData.ped, true)
-							local weapon = ESX.GetWeaponFromHash(weaponHash) 
+							local weapon = ESX.GetWeaponFromHash(weaponHash)
 							if weapon then
 								local ammoCount = GetAmmoInPedWeapon(ESX.PlayerData.ped, weaponHash)
-								if weapon.name ~= currentWeapon.name then 
+								if weapon.name ~= currentWeapon.name then
 									currentWeapon.Ammo = ammoCount
 									currentWeapon.name = weapon.name
 								else
 									if ammoCount ~= currentWeapon.Ammo then
 										currentWeapon.Ammo = ammoCount
 										TriggerServerEvent('esx:updateWeaponAmmo', weapon.name, ammoCount)
-									end 
-								end   
+									end
+								end
 							end
-						end    
+						end
 					Wait(sleep)
 					end
 			end)
