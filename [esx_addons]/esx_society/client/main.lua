@@ -122,8 +122,6 @@ function OpenBossMenu(society, close, options)
 						{icon = "fas fa-wallet", title = "Amount", input = true, inputType = "number", inputPlaceholder = "Amount to withdraw..", inputMin = 1, inputMax = 250000, name = "withdraw"},
 						{icon = "fas fa-check", title = "Confirm", value = "confirm"},
 						{icon = "fas fa-arrow-left", title = "Return", value = "return"}
-						{icon = "fas fa-check", title = "Confirm", value = "confirm"},
-						{icon = "fas fa-arrow-left", title = "Return", value = "return"}
 					}
 					ESX.RefreshContext(elements)
 				elseif element.value == "confirm" then
