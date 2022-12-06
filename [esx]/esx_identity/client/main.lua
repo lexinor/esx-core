@@ -54,7 +54,7 @@ if not Config.UseDeferrals then
         if not guiEnabled then
             return
         end
-
+        
         ESX.TriggerServerCallback('esx_identity:registerIdentity', function(callback)
             if not callback then
                 return
@@ -65,19 +65,20 @@ if not Config.UseDeferrals then
 
             if not ESX.GetConfig().Multichar then
                 TriggerEvent('esx_skin:playerRegistered')
-            if callback then
-                ESX.ShowNotification(TranslateCap('thank_you_for_registering'))
-                EnableGui(false)
-                if not ESX.GetConfig().Multichar then 
-                    TriggerEvent('esx_skin:playerRegistered') 
-                end 
-                TriggerEvent('esx_skin:openRegisterMenu', function() 
-                    finished = true
-                end, function() 
-                    finished = true 
-                end)
-            else
-                ESX.ShowNotification(_U('registration_error'), "error", 5000)
+                if callback then
+                    ESX.ShowNotification(TranslateCap('thank_you_for_registering'))
+                    setGuiState(false)
+                    if not ESX.GetConfig().Multichar then 
+                        TriggerEvent('esx_skin:playerRegistered') 
+                    end
+                    TriggerEvent('esx_skin:openRegisterMenu', function() 
+                        finished = true
+                    end, function() 
+                        finished = true 
+                    end)
+                else
+                    ESX.ShowNotification(TranslateCap('registration_error'), "error", 5000)
+                end
             end
         end, data)
     end)
