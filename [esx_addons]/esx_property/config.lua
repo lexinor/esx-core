@@ -1,7 +1,7 @@
 Config = {}
 
 -------- Note: Can Cause quite abit of clutter ---------------
-Config.ForSaleBlips = false -- Add Blips to For Sale Properties
+Config.ForSaleBlips = true -- Add Blips to For Sale Properties
 Config.OwnedBlips = true -- Add blips for Owned Properties
 ---------------------------------------------------------------
 
@@ -157,7 +157,7 @@ end
 Config.PlayerManagement = {                          
   Enabled = true, -- Enable/Disable Player Management Default: true
   job = "realestateagent", -- Job Required to Manage Players Default: "realestateagent"                 
-  joblabel = "Estate Agent", -- Job Label Default: "Estate Agent"          
+  joblabel = "Agent Immobilier", -- Job Label Default: "Estate Agent"          
   society = "society_realestateagent", -- Society Required to Manage Players Default: "society_realestateagent"
   SalePercentage = 0.25, -- Sale Percentage Default: 0.25 -- Note: This is a percentage of the price of the house
   jobRanks = {
