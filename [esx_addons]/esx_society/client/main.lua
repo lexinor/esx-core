@@ -243,9 +243,9 @@ function OpenEmployeeList(society, options)
 					elseif element2.value == "fire" then
 						ESX.ShowNotification(TranslateCap('you_have_fired', employee.name))
 
-						ESX.TriggerServerCallback('esx_society:setJob', function()
+						ESX.TriggerServerCallback('esx_society:'..event, function()
 							OpenEmployeeList(society, options)
-						end, employee.identifier, 'unemployed', 0, 'fire')
+						end, employee.identifier, selected, 0, 'fire')
 					elseif element2.value == "return" then
 						OpenEmployeeList(society, options)
 					end
