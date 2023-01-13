@@ -99,14 +99,14 @@ if not Config.Multichar then
     if identifier then
       if ESX.GetPlayerFromIdentifier(identifier) then
         deferrals.done(
-          ('There was an error loading your character!\nError code: identifier-active\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same account.\n\nYour identifier: %s'):format(
+          ('[ESX] There was an error loading your character!\nError code: identifier-active\n\nThis error is caused by a player on this server who has the same identifier as you have. Make sure you are not playing on the same account.\n\nYour identifier: %s'):format(
             identifier))
       else
         deferrals.done()
       end
     else
       deferrals.done(
-        'There was an error loading your character!\nError code: identifier-missing\n\nThe cause of this error is not known, your identifier could not be found. Please come back later or report this problem to the server administration team.')
+        '[ESX] There was an error loading your character!\nError code: identifier-missing\n\nThe cause of this error is not known, your identifier could not be found. Please come back later or report this problem to the server administration team.')
     end
   end)
 end
@@ -142,9 +142,9 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
     local index = #userData.accounts + 1
     userData.accounts[index] = {
-      name = account, 
+      name = account,
       money = foundAccounts[account] or Config.StartingAccountMoney[account] or 0,
-      label = data.label, 
+      label = data.label,
       round = data.round,
       index = index
     }
@@ -339,25 +339,32 @@ function loadESXPlayer(identifier, playerId, isNew)
 
   TriggerEvent('esx:playerLoaded', playerId, xPlayer, isNew)
 
-    xPlayer.triggerEvent('esx:playerLoaded', {
-        accounts = xPlayer.getAccounts(),
-        coords = xPlayer.getCoords(),
-        identifier = xPlayer.getIdentifier(),
-        inventory = xPlayer.getInventory(),
-        job = xPlayer.getJob(),
-        faction = xPlayer.getFaction(),
-        loadout = xPlayer.getLoadout(),
-        maxWeight = xPlayer.getMaxWeight(),
-        money = xPlayer.getMoney(),
-        dead = false
-    }, isNew, userData.skin)
+  xPlayer.triggerEvent('esx:playerLoaded',
+    {
+      accounts = xPlayer.getAccounts(), 
+      coords = xPlayer.getCoords(), 
+      identifier = xPlayer.getIdentifier(), 
+      inventory = xPlayer.getInventory(),
+      job = xPlayer.getJob(), 
+      faction = xPlayer.getFaction(),
+      loadout = xPlayer.getLoadout(), 
+      maxWeight = xPlayer.getMaxWeight(), 
+      money = xPlayer.getMoney(),
+      sex = xPlayer.get("sex") or "m",
+      firstName = xPlayer.get("firstName") or "John",
+      lastName = xPlayer.get("lastName") or "Doe",
+      dateofbirth = xPlayer.get("dateofbirth") or "01/01/2000",
+      height = xPlayer.get("height") or 120,
+      dead = false
+    }, isNew,
+    userData.skin)
 
   if not Config.OxInventory then
     xPlayer.triggerEvent('esx:createMissingPickups', Core.Pickups)
   else
     exports.ox_inventory:setPlayerInventory(xPlayer, userData.inventory)
   end
-
+  xPlayer.updateCoords()
   xPlayer.triggerEvent('esx:registerSuggestions', Core.RegisteredCommands)
   print(('[^2INFO^0] Player ^5"%s"^0 has connected to the server. ID: ^5%s^7'):format(xPlayer.getName(), playerId))
 end
@@ -397,16 +404,6 @@ AddEventHandler('esx:playerLogout', function(playerId, cb)
     end)
   end
   TriggerClientEvent("esx:onPlayerLogout", playerId)
-end)
-
-RegisterNetEvent('esx:updateCoords')
-AddEventHandler('esx:updateCoords', function()
-  local source = source
-  local xPlayer = ESX.GetPlayerFromId(source)
-
-  if xPlayer then
-    xPlayer.updateCoords()
-  end
 end)
 
 if not Config.OxInventory then

@@ -46,7 +46,7 @@ if not Config.UseDeferrals then
         if Config.PELoadingScreen then
             exports["pe-basicloading"]:shutdown()
         end        
-        TriggerEvent('esx_skin:resetFirstSpawn')        
+        TriggerEvent('esx_skin:resetFirstSpawn')
         if not ESX.PlayerData.dead then setGuiState(true) end
     end)
 

@@ -35,7 +35,6 @@ if ESX.GetConfig().Multichar then
 		RenderScriptCams(true, false, 1, true, true)
 		SetCamCoord(cam, offset.x, offset.y, offset.z)
 		PointCamAtCoord(cam, Config.Spawn.x, Config.Spawn.y, Config.Spawn.z + 1.3)
-		ESX.UI.Menu.CloseAll()
 		ESX.UI.HUD.SetDisplay(0.0)
 		StartLoop()
 		ShutdownLoadingScreen()
@@ -141,6 +140,24 @@ if ESX.GetConfig().Multichar then
 		})
 	end
 
+	function CharacterDeleteConfirmation(Characters, slots, SelectedCharacter, value)
+		local elements = {
+			{title = TranslateCap('char_delete_confirmation'), icon = "fa-solid fa-users", description = TranslateCap('char_delete_confirmation_description'), unselectable = true},
+			{title = TranslateCap('char_delete'), icon ="fa-solid fa-xmark", description = TranslateCap('char_delete_yes_description'), action = 'delete', value = value},
+			{title = TranslateCap('return'), unselectable = false, icon = "fa-solid fa-arrow-left", description = TranslateCap('char_delete_no_description'), action = "return"}
+		}
+	
+		ESX.OpenContext("left", elements, function(element, Action)
+			if Action.action == "delete" then
+				ESX.CloseContext()
+				TriggerServerEvent('esx_multicharacter:DeleteCharacter', Action.value)
+				spawned = false
+			elseif Action.action == "return" then
+				CharacterOptions(Characters, slots, SelectedCharacter)
+			end
+		end, nil, false)
+	end
+
 	function CharacterOptions(Characters, slots, SelectedCharacter)
 		local elements = {{title = TranslateCap('character', Characters[SelectedCharacter.value].firstname .. " ".. Characters[SelectedCharacter.value].lastname),icon = "fa-regular fa-user", unselectable = true}, 
 		{title = TranslateCap('return'), unselectable = false,icon = "fa-solid fa-arrow-left",description = TranslateCap('return_description'), action = "return"}}
@@ -158,13 +175,11 @@ if ESX.GetConfig().Multichar then
 				ESX.CloseContext()
 				TriggerServerEvent('esx_multicharacter:CharacterChosen', Action.value, false)
 			elseif Action.action == "delete" then
-					ESX.CloseContext()
-					TriggerServerEvent('esx_multicharacter:DeleteCharacter', Action.value)
-					spawned = false
+				CharacterDeleteConfirmation(Characters, slots, SelectedCharacter, Action.value)
 			elseif Action.action == "return" then
 				SelectCharacterMenu(Characters, slots)
 			end
-		end, nil, true)
+		end, nil, false)
 	end
 
 	function SelectCharacterMenu(Characters, slots)
@@ -212,7 +227,7 @@ if ESX.GetConfig().Multichar then
 				SetPedAoBlobRendering(playerPed, true)
 				ResetEntityAlpha(playerPed)
 			end
-		end, nil, true)
+		end, nil, false)
 	end
 	RegisterNetEvent('esx_multicharacter:SetupUI')
 	AddEventHandler('esx_multicharacter:SetupUI', function(data, slots)
