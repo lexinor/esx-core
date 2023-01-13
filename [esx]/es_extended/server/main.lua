@@ -688,17 +688,12 @@ AddEventHandler('txAdmin:events:serverShuttingDown', function()
   Core.SavePlayers()
 end)
 
-RegisterNetEvent('lexinor:updateLastConnection')
-AddEventHandler('lexinor:updateLastConnection', function(identifier)
+RegisterNetEvent('lexinor:updateLastConnection', function(identifier)
 	if identifier then
-		local currentTime = os.date("%d/%m/%Y")
-		MySQL.Async.execute("UPDATE users SET last_connection = @currentTime WHERE identifier = @identifier", {
-			["@identifier"] = identifier,
-			["@currentTime"] = currentTime,
-		}, function(hasUpdatedConnectionDate)
-			if hasUpdatedConnectionDate then
-				print("Last connection date updated for users : "..identifier)
-			end
-		end)
+		local currentTime = os.date("%d/%m/%Y %H:%M:%S")
+    local hasUpdatedConnectionDate = MySQL.update.await("UPDATE users SET last_connection = ? WHERE identifier = ?", {currentTime, identifier})
+    if hasUpdatedConnectionDate then
+      print("Last connection date updated for users : "..identifier)
+    end
 	end
 end)
