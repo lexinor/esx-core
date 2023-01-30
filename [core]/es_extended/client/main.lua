@@ -681,7 +681,6 @@ local function noclipThread()
 			end
 	end
 	Wait(Sleep)
-	end
 end
 
 RegisterNetEvent("esx:noclip")
