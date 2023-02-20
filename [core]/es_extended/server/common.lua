@@ -8,12 +8,12 @@ Core.UsableItemsCallbacks = {}
 Core.ServerCallbacks = {}
 Core.ClientCallbacks = {}
 Core.CurrentRequestId = 0
-Core.TimeoutCount = -1
-Core.CancelledTimeouts = {}
 Core.RegisteredCommands = {}
 Core.Pickups = {}
 Core.PickupId = 0
 Core.PlayerFunctionOverrides = {}
+
+Core.playersByIdentifier = {}
 
 AddEventHandler("esx:getSharedObject", function()
 	local Invoke = GetInvokingResource()
@@ -67,97 +67,15 @@ MySQL.ready(function()
     end
   end
 
-  local Jobs = {}
-  local jobs = MySQL.query.await('SELECT * FROM jobs')
+  ESX.RefreshJobs()
+  ESX.RefreshFactions()
 
-  for _, v in ipairs(jobs) do
-    Jobs[v.name] = v
-    Jobs[v.name].grades = {}
-  end
-
-  local jobGrades = MySQL.query.await('SELECT * FROM job_grades')
-
-  for _, v in ipairs(jobGrades) do
-    if Jobs[v.job_name] then
-      Jobs[v.job_name].grades[tostring(v.grade)] = v
-    else
-      print(('[^3WARNING^7] Ignoring job grades for ^5%s^0 due to missing job'):format(v.job_name))
-    end
-  end
-
-  for _, v in pairs(Jobs) do
-    if ESX.Table.SizeOf(v.grades) == 0 then
-      Jobs[v.name] = nil
-      print(('[^3WARNING^7] Ignoring job ^5%s^0 due to no job grades found'):format(v.name))
-    end
-  end
-
-	if not Jobs then
-		-- Fallback data, if no jobs exist
-		ESX.Jobs['unemployed'] = {
-			label = 'Unemployed',
-			grades = {
-				['0'] = {
-					grade = 0,
-					label = 'Unemployed',
-					salary = 200,
-                    onDuty = false,
-					skin_male = {},
-					skin_female = {}
-				}
-			}
-		}
-	else
-		ESX.Jobs = Jobs
-	end
-
-	--Faction
-local Factions = {}
-local factions = MySQL.query.await('SELECT * FROM factions')
-
-for _, v in ipairs(factions) do
-    Factions[v.name] = v
-    Factions[v.name].grades = {}
-end
-
-local factionGrades = MySQL.query.await('SELECT * FROM faction_grades')
-
-for _, v in ipairs(factionGrades) do
-    if Factions[v.faction_name] then
-        Factions[v.faction_name].grades[tostring(v.grade)] = v
-    else
-        print(('[^3WARNING^7] Ignoring faction grades for ^5"%s"^0 due to missing faction'):format(v.faction_name))
-    end
-end
-
-for _, v in pairs(Factions) do
-    if ESX.Table.SizeOf(v.grades) == 0 then
-        Factions[v.name] = nil
-        print(('[^3WARNING^7] Ignoring faction ^5"%s"^0due to no faction grades found'):format(v.name))
-    end
-end
-
-if not Factions then
-    -- Fallback data, if no jobs exist
-    ESX.Factions['nofaction'] = {
-        label = 'Sans faction',
-        grades = {
-            ['0'] = {
-                grade = 0,
-                label = 'Sans faction',
-                salary = 0,
-                skin_male = {},
-                skin_female = {}
-            }
-        }
-    }
-else
-    ESX.Factions = Factions
-end
-
-  print('[^2INFO^7] ESX ^5Legacy 1.9.0^0 initialized!')
+  print(('[^2INFO^7] ESX ^5Legacy %s^0 initialized!'):format(GetResourceMetadata(GetCurrentResourceName(), "version", 0)))
+    
   StartDBSync()
-  StartPayCheck()
+  if Config.EnablePaycheck then
+		StartPayCheck()
+	end
 end)
 
 RegisterServerEvent('esx:clientLog')

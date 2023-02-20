@@ -71,11 +71,10 @@ function createESXPlayer(identifier, playerId, data)
     accounts[account] = money
   end
 
+  local defaultGroup = "user"
   if Core.IsPlayerAdmin(playerId) then
     print(('[^2INFO^0] Player ^5%s^0 Has been granted admin permissions via ^5Ace Perms^7.'):format(playerId))
     defaultGroup = "admin"
-  else
-    defaultGroup = "user"
   end
 
   if not Config.Multichar then
@@ -285,12 +284,7 @@ function loadESXPlayer(identifier, playerId, isNew)
   end
 
   -- Position
-  if result.position and result.position ~= '' then
-    userData.coords = json.decode(result.position)
-  else
-    print('[^3WARNING^7] Column ^5"position"^0 in ^5"users"^0 table is missing required default value. Using backup coords, fix your database.')
-    userData.coords = {x = -269.4, y = -955.3, z = 31.2, heading = 205.8}
-  end
+  userData.coords = json.decode(result.position) or Config.DefaultSpawn
 
   -- Skin
   if result.skin and result.skin ~= '' then
@@ -319,9 +313,9 @@ function loadESXPlayer(identifier, playerId, isNew)
     end
   end
 
-    local xPlayer = CreateExtendedPlayer(playerId, identifier, userData.group, userData.accounts, userData.inventory,
-        userData.weight, userData.job, userData.faction, userData.loadout, userData.playerName, userData.coords)
-    ESX.Players[playerId] = xPlayer
+  local xPlayer = CreateExtendedPlayer(playerId, identifier, userData.group, userData.accounts, userData.inventory, userData.weight, userData.job, userData.faction,
+    userData.loadout, userData.playerName, userData.coords)
+  ESX.Players[playerId] = xPlayer
 
   if userData.firstname then
     xPlayer.set('firstName', userData.firstname)
@@ -382,13 +376,15 @@ AddEventHandler('playerDropped', function(reason)
   local playerId = source
   local xPlayer = ESX.GetPlayerFromId(playerId)
 
-    if xPlayer then
-        TriggerEvent('esx:playerDropped', playerId, reason)
-        TriggerEvent('lexinor:updateLastConnection', xPlayer.identifier)
-        Core.SavePlayer(xPlayer, function()
-            ESX.Players[playerId] = nil
-        end)
-    end
+  if xPlayer then
+    TriggerEvent('esx:playerDropped', playerId, reason)
+    TriggerEvent('lexinor:updateLastConnection', xPlayer.identifier)
+    
+    Core.playersByIdentifier[xPlayer.identifier] = nil
+    Core.SavePlayer(xPlayer, function()
+      ESX.Players[playerId] = nil
+    end)
+  end
 end)
 
 AddEventHandler('esx:playerLogout', function(playerId, cb)
@@ -396,6 +392,7 @@ AddEventHandler('esx:playerLogout', function(playerId, cb)
   if xPlayer then
     TriggerEvent('esx:playerDropped', playerId)
 
+    Core.playersByIdentifier[xPlayer.identifier] = nil
     Core.SavePlayer(xPlayer, function()
       ESX.Players[playerId] = nil
       if cb then
