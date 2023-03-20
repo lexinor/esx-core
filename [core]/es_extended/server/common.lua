@@ -5,15 +5,14 @@ ESX.Factions = {}
 ESX.Items = {}
 Core = {}
 Core.UsableItemsCallbacks = {}
-Core.ServerCallbacks = {}
-Core.ClientCallbacks = {}
-Core.CurrentRequestId = 0
 Core.RegisteredCommands = {}
 Core.Pickups = {}
 Core.PickupId = 0
 Core.PlayerFunctionOverrides = {}
-
+Core.DatabaseConnected = false
 Core.playersByIdentifier = {}
+
+Core.vehicleTypesByModel = {}
 
 AddEventHandler("esx:getSharedObject", function()
 	local Invoke = GetInvokingResource()
@@ -41,22 +40,18 @@ local function StartDBSync()
 end
 
 MySQL.ready(function()
-	if not Config.OxInventory then
-		local items = MySQL.query.await('SELECT * FROM items')
-		for k, v in ipairs(items) do
-			ESX.Items[v.name] = {
-				label = v.label,
-				weight = v.weight,
-				rare = v.rare,
-				canRemove = v.can_remove
-			}
-		end
-	else
-		TriggerEvent('__cfx_export_ox_inventory_Items', function(ref)
-			if ref then
-				ESX.Items = ref()
-			end
-		end)
+  Core.DatabaseConnected = true
+  if not Config.OxInventory then
+    local items = MySQL.query.await('SELECT * FROM items')
+    for k, v in ipairs(items) do
+      ESX.Items[v.name] = {label = v.label, weight = v.weight, rare = v.rare, canRemove = v.can_remove}
+    end
+  else
+    TriggerEvent('__cfx_export_ox_inventory_Items', function(ref)
+      if ref then
+        ESX.Items = ref()
+      end
+    end)
 
     AddEventHandler('ox_inventory:itemList', function(items)
       ESX.Items = items
@@ -83,15 +78,6 @@ AddEventHandler('esx:clientLog', function(msg)
   if Config.EnableDebug then
     print(('[^2TRACE^7] %s^7'):format(msg))
   end
-end)
-
-RegisterServerEvent('esx:triggerServerCallback')
-AddEventHandler('esx:triggerServerCallback', function(name, requestId,Invoke, ...)
-  local source = source
-
-  ESX.TriggerServerCallback(name, requestId, source,Invoke, function(...)
-    TriggerClientEvent('esx:serverCallback', source, requestId,Invoke, ...)
-  end, ...)
 end)
 
 RegisterNetEvent("esx:ReturnVehicleType", function(Type, Request)

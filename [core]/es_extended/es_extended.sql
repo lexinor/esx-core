@@ -17,6 +17,7 @@ CREATE TABLE `users` (
 	`faction` VARCHAR(20) NULL DEFAULT 'nofaction',
 	`faction_grade` INT NULL DEFAULT 0,
 	`loadout` LONGTEXT NULL DEFAULT NULL,
+	`metadata` LONGTEXT NULL DEFAULT NULL,
 	`position` longtext NULL DEFAULT NULL,
 
 	PRIMARY KEY (`identifier`)
