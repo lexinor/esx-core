@@ -15,13 +15,13 @@ $(document).ready(function () {
 
     const dateCheck = new Date(dofVal);
 
-    const year = new Intl.DateTimeFormat("en", { year: "numeric" }).format(
+    const year = new Intl.DateTimeFormat("fr-FR", { year: "numeric" }).format(
       dateCheck
     );
-    const month = new Intl.DateTimeFormat("en", { month: "2-digit" }).format(
+    const month = new Intl.DateTimeFormat("fr-FR", { month: "2-digit" }).format(
       dateCheck
     );
-    const day = new Intl.DateTimeFormat("en", { day: "2-digit" }).format(
+    const day = new Intl.DateTimeFormat("fr-FR", { day: "2-digit" }).format(
       dateCheck
     );
 
