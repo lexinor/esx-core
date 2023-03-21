@@ -93,13 +93,21 @@ end, false, {help = TranslateCap('command_car'), validate = false, arguments = {
 ESX.RegisterCommand({'cardel', 'dv'}, { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	local PedVehicle = GetVehiclePedIsIn(GetPlayerPed(xPlayer.source), false)
 	if DoesEntityExist(PedVehicle) then
-		DeleteEntity(PedVehicle)
+		if GetResourceState("AdvancedParking") == "started" then
+			TriggerEvent("AdvancedParking:deleteVehicle", GetVehicleNumberPlateText(PedVehicle), true)
+		else
+			DeleteEntity(PedVehicle)
+		end
 	end
 	local Vehicles = ESX.OneSync.GetVehiclesInArea(GetEntityCoords(GetPlayerPed(xPlayer.source)), tonumber(args.radius) or 5.0)
 	for i=1, #Vehicles do 
 		local Vehicle = NetworkGetEntityFromNetworkId(Vehicles[i])
 		if DoesEntityExist(Vehicle) then
-			DeleteEntity(Vehicle)
+			if GetResourceState("AdvancedParking") == "started" then
+				TriggerEvent("AdvancedParking:deleteVehicle", GetVehicleNumberPlateText(Vehicle), true)
+			else
+				DeleteEntity(Vehicle)
+			end
 		end
 	end
 end, false, {help = TranslateCap('command_cardel'), validate = false, arguments = {
