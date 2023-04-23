@@ -25,14 +25,19 @@ end, true, {help = TranslateCap('command_setjob'), validate = true, arguments = 
 
 ESX.RegisterCommand('setfaction', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 	if ESX.DoesFactionExist(args.faction, args.grade) then
-		args.playerId.setFaction(args.faction, args.grade)
-	else
-		showError('Commande setfaction invalide!')
-	end
-end, true, {help = 'Commande setfaction', validate = true, arguments = {
-	{name = 'playerId', help = _U('commandgeneric_playerid'), type = 'player'},
-	{name = 'faction', help = 'faction', type = 'string'},
-	{name = 'grade', help = 'grade', type = 'number'}
+        args.playerId.setFaction(args.faction, args.grade)
+    else
+        showError("Commande setFaction Invalide")
+    end
+    ESX.DiscordLogFields("UserActions", "/setfaction Triggered", "pink", {
+        {name = "Player", value = xPlayer.name, inline = true},
+        {name = "Faction", value = args.faction, inline = true},
+    {name = "Grade", value = args.grade, inline = true}
+    })
+end, true, {help = 'setfaction', validate = true, arguments = {
+    {name = 'playerId', help = 'id', type = 'player'},
+    {name = 'faction', help = 'name', type = 'string'},
+    {name = 'grade', help = 'grade', type = 'number'}
 }})
 
 local upgrades = Config.SpawnVehMaxUpgrades and

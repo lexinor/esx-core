@@ -218,17 +218,17 @@ end
 ESX.GetPlayers = GetPlayers
 
 function ESX.GetExtendedPlayers(key, val)
-	local xPlayers = {}
-	for k, v in pairs(ESX.Players) do
-		if key then
-			if (key == 'job' and v.job.name == val) or v[key] == val or (key == 'faction' and v.faction.name == val) then
-				xPlayers[#xPlayers + 1] = v
-			end
-		else
-			xPlayers[#xPlayers + 1] = v
-		end
-	end
-	return xPlayers
+  local xPlayers = {}
+  for k, v in pairs(ESX.Players) do
+      if key then
+          if (key == 'job' and v.job.name == val) or (key == 'faction' and v.faction.name == val) or v[key] == val then
+              xPlayers[#xPlayers + 1] = v
+          end
+      else
+          xPlayers[#xPlayers + 1] = v
+      end
+  end
+  return xPlayers
 end
 
 function ESX.GetPlayerFromId(source)
@@ -352,65 +352,53 @@ function ESX.RefreshJobs()
   end
 end
 
-function ESX.RefreshFactions() 
-	local Factions = {}
-	local factions = MySQL.query.await('SELECT * FROM factions')
+function ESX.RefreshFactions()
+  local Factions = {}
+  local factions = MySQL.query.await('SELECT * FROM factions')
 
-	for _, v in ipairs(factions) do
-		Factions[v.name] = v
-		Factions[v.name].grades = {}
-	end
+  for _, v in ipairs(factions) do
+      Factions[v.name] = v
+      Factions[v.name].grades = {}
+  end
 
-	local factionGrades = MySQL.query.await('SELECT * FROM faction_grades')
+  local factionGrades = MySQL.query.await('SELECT * FROM faction_grades')
 
-	for _, v in ipairs(factionGrades) do
-		if Factions[v.faction_name] then
-			Factions[v.faction_name].grades[tostring(v.grade)] = v
-		else
-			print(('[^3WARNING^7] Ignoring faction grades for ^5"%s"^0 due to missing faction'):format(v.job_name))
-		end
-	end
+  for _, v in ipairs(factionGrades) do
+      if Factions[v.faction_name] then
+          Factions[v.faction_name].grades[tostring(v.grade)] = v
+      else
+          print(('[^3WARNING^7] Ignoring faction grades for ^5"%s"^0 due to missing faction'):format(v.faction_name))
+      end
+  end
 
-	for _, v in pairs(Factions) do
-		if ESX.Table.SizeOf(v.grades) == 0 then
-			Factions[v.name] = nil
-			print(('[^3WARNING^7] Ignoring faction ^5"%s"^0 due to no faction grades found'):format(v.name))
-		end
-	end
+  for _, v in pairs(Factions) do
+      if ESX.Table.SizeOf(v.grades) == 0 then
+          Factions[v.name] = nil
+          print(('[^3WARNING^7] Ignoring faction ^5"%s"^0 due to no faction grades found'):format(v.name))
+      end
+  end
 
-	if not Factions then
-		-- Fallback data, if no jobs exist
-		ESX.Factions['nofaction'] = {
-			label = 'Sans faction',
-			grades = {
-				['0'] = {
-					grade = 0,
-					label = 'Sans faction',
-					salary = 0,
-					skin_male = {},
-					skin_female = {}
-				}
-			}
-		}
-	else
-		ESX.Factions = Factions
-	end
+  if not Factions then
+      -- Fallback data, if no factions exist
+      ESX.Factions['nofaction'] = {label = 'Faction', grades = {['0'] = {grade = 0, label = 'Sans faction', salary = 0, skin_male = {}, skin_female = {}}}}
+  else
+      ESX.Factions = Factions
+  end
 end
 
 function ESX.GetFactions()
-	return ESX.Factions
+  return ESX.Factions
 end
 
 function ESX.DoesFactionExist(faction, gradef)
-	gradef = tostring(gradef)
+  gradef = tostring(gradef)
 
-	if faction and gradef then
-		if ESX.Factions[faction] and ESX.Factions[faction].grades[gradef] then
-			return true
-		end
-	end
-
-	return false
+  if faction and gradef then
+      if ESX.Factions[faction] and ESX.Factions[faction].grades[gradef] then
+          return true
+      end
+  end
+  return false
 end
 
 function ESX.RegisterUsableItem(item, cb)

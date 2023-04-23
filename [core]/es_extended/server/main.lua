@@ -17,7 +17,7 @@ loadPlayer = loadPlayer .. ' FROM `users` WHERE identifier = ?'
 
 if Config.Multichar then
   AddEventHandler('esx:onPlayerJoined', function(src, char, data)
-    while not next(ESX.Jobs) do
+    while not next(ESX.Jobs) and not next(ESX.Factions) do
       Wait(50)
     end
 
@@ -187,33 +187,33 @@ function loadESXPlayer(identifier, playerId, isNew)
     userData.job.skin_female = json.decode(gradeObject.skin_female)
   end
 
-    -- Faction
-    if ESX.DoesFactionExist(faction, gradef) then
-        factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
-    else
-        print(('[^3WARNING^7] Ignoring invalid faction for %s [faction: %s, grade: %s]'):format(identifier, faction, gradef))
-        faction, gradef = 'nofaction', '0'
-        factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
-    end
-
-    userData.faction.id = factionObject.id
-    userData.faction.name = factionObject.name
-    userData.faction.label = factionObject.label
-
-    userData.faction.grade = tonumber(gradef)
-    userData.faction.grade_name = gradefObject.name
-    userData.faction.grade_label = gradefObject.label
-    userData.faction.grade_salary = gradefObject.salary
-
-    userData.faction.skin_male = {}
-    userData.faction.skin_female = {}
-
-    if gradefObject.skin_male then
-        userData.faction.skin_male = json.decode(gradefObject.skin_male)
-    end
-    if gradefObject.skin_female then
-        userData.faction.skin_female = json.decode(gradefObject.skin_female)
-    end
+  -- Faction
+  if ESX.DoesFactionExist(faction, gradef) then
+    factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
+  else
+    print(('[^3WARNING^7] Ignoring invalid faction for %s [faction: %s, grade: %s]'):format(identifier, faction, gradef))
+    faction, gradef = 'nofaction', '0'
+    factionObject, gradefObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradef]
+  end
+  
+  userData.faction.id = factionObject.id
+  userData.faction.name = factionObject.name
+  userData.faction.label = factionObject.label
+  
+  userData.faction.grade = tonumber(gradef)
+  userData.faction.grade_name = gradefObject.name
+  userData.faction.grade_label = gradefObject.label
+  userData.faction.grade_salary = gradefObject.salary
+  
+  userData.faction.skin_male = {}
+  userData.faction.skin_female = {}
+  
+  if gradefObject.skin_male then
+    userData.faction.skin_male = json.decode(gradefObject.skin_male)
+  end
+  if gradefObject.skin_female then
+    userData.faction.skin_female = json.decode(gradefObject.skin_female)
+  end
 
     -- Inventory
     if not Config.OxInventory then
