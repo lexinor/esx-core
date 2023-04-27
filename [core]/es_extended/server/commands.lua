@@ -265,7 +265,7 @@ ESX.RegisterCommand('job', { "dev", "superadmin", "admin", "mod", "user"}, funct
 end, true)
 
 ESX.RegisterCommand('faction', { "dev", "superadmin", "admin", "mod", "user"}, function(xPlayer, args, showError)
-	print(xPlayer.getFaction()..", You are currently: ^5".. xPlayer.getFaction().name.. "^0 - ^5".. xPlayer.getFaction().grade_label .. "^0")
+	print("Vous appartenez à : ^5".. xPlayer.getFaction().name.. "^0 - ^5".. xPlayer.getFaction().grade_label .. "^0")
 end, true)
 
 ESX.RegisterCommand('info', {"dev", "superadmin", "admin", "user"}, function(xPlayer, args, showError)
