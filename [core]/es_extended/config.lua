@@ -23,7 +23,7 @@ Config.DefaultSpawn 			= {x = -269.4, y = -955.3, z = 31.2, heading = 205.8 }
 Config.EnablePaycheck			= true -- enable paycheck
 Config.EnableSocietyPayouts 	= true -- pay from the society account that the player is employed at? Requirement: esx_society
 Config.MaxWeight            	= 24   -- the max inventory weight without backpack
-Config.PaycheckInterval         = 7 * 60000 -- how often to recieve pay checks in milliseconds
+Config.PaycheckInterval         = 15 * 60000 -- how often to recieve pay checks in milliseconds
 Config.EnableDebug              = false -- Use Debug options?
 Config.EnableDefaultInventory   = true -- Display the default Inventory ( F2 )
 Config.EnableWantedLevel    	= false -- Use Normal GTA wanted Level?
@@ -37,7 +37,7 @@ Config.DisableHealthRegeneration  = true -- Player will no longer regenerate hea
 Config.DisableVehicleRewards      = true -- Disables Player Recieving weapons from vehicles
 Config.DisableNPCDrops            = true -- stops NPCs from dropping weapons on death
 Config.DisableDispatchServices	  = true -- Disable Dispatch services
-Config.DisableScenarios			  = false -- Disable Scenarios
+Config.DisableScenarios			  = true -- Disable Scenarios
 Config.DisableWeaponWheel         = true -- Disables default weapon wheel
 Config.DisableAimAssist           = true -- disables AIM assist (mainly on controllers)
 Config.DisableVehicleSeatShuff	  = true -- Disables vehicle seat shuff
