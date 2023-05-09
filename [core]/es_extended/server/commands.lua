@@ -96,7 +96,7 @@ end, false, {help = TranslateCap('command_car'), validate = false, arguments = {
 }}) 
 
 ESX.RegisterCommand({'cardel', 'dv'}, { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
-	local PedVehicle = GetVehiclePedIsIn(GetPlayerPed(xPlayer.source), false)
+	local PedVehicle = GetVehiclePedIsIn(GetPlayerPed(xPlayer.source), true)
 	if DoesEntityExist(PedVehicle) then
 		if GetResourceState("AdvancedParking") == "started" then
 			TriggerEvent("AdvancedParking:deleteVehicle", GetVehicleNumberPlateText(PedVehicle), true)
