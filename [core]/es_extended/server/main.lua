@@ -331,6 +331,7 @@ function loadESXPlayer(identifier, playerId, isNew)
   local xPlayer = CreateExtendedPlayer(playerId, identifier, userData.group, userData.accounts, userData.inventory, userData.weight, userData.job, userData.faction,
     userData.loadout, userData.playerName, userData.coords, userData.metadata)
   ESX.Players[playerId] = xPlayer
+  Core.playersByIdentifier[identifier] = xPlayer
 
   if userData.firstname then
     xPlayer.set('firstName', userData.firstname)
