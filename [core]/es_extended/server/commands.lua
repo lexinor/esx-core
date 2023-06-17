@@ -233,7 +233,7 @@ if not Config.OxInventory then
 	}})
 end
 
-ESX.RegisterCommand('setgroup', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
+ESX.RegisterCommand('setgroup', { "dev", "superadmin"}, function(xPlayer, args, showError)
 	if not args.playerId then args.playerId = xPlayer.source end
 	if args.group == "dev" then args.group = "dev" end
 	if args.group == "superadmin" then args.group = "superadmin" end
@@ -300,13 +300,13 @@ end, true, {help = TranslateCap('command_bring'), validate = true, arguments = {
 	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
-ESX.RegisterCommand('kill', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
+ESX.RegisterCommand('kill', { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)
 	args.playerId.triggerEvent("esx:killPlayer")
 end, true, {help = TranslateCap('command_kill'), validate = true, arguments = {
 	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
 }})
 
-ESX.RegisterCommand('freeze', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
+ESX.RegisterCommand('freeze', { "dev", "superadmin", "admin", "mod"}, function(xPlayer, args, showError)
 	args.playerId.triggerEvent('esx:freezePlayer', "freeze")
 end, true, {help = TranslateCap('command_freeze'), validate = true, arguments = {
 	{name = 'playerId', help = TranslateCap('commandgeneric_playerid'), type = 'player'}
