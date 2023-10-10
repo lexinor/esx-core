@@ -23,7 +23,7 @@ AddEventHandler('esx:loadingScreenOff', function()
     loadingScreenFinished = true
 end)
 
-RegisterNUICallback('ready', function(data, cb)
+RegisterNUICallback('ready', function(_, cb)
     ready = true
     cb(1)
 end)
@@ -39,7 +39,7 @@ if not Config.UseDeferrals then
             ClearTimecycleModifier()
         end
 
-        SendNUIMessage({type = "enableui", enable = state})
+        SendNUIMessage({ type = "enableui", enable = state })
     end
 
     RegisterNetEvent('esx_identity:showRegisterIdentity', function()
@@ -47,10 +47,14 @@ if not Config.UseDeferrals then
             exports["pe-basicloading"]:shutdown()
         end        
         TriggerEvent('esx_skin:resetFirstSpawn')
+        while not (ready and loadingScreenFinished) do
+            print('Waiting for esx_identity NUI..')
+            Wait(100)
+        end
         if not ESX.PlayerData.dead then setGuiState(true) end
     end)
 
-    RegisterNUICallback('register', function(data, cb)
+    RegisterNUICallback('register', function(data,cb)
         if not guiEnabled then
             return
         end
@@ -81,5 +85,6 @@ if not Config.UseDeferrals then
                 end
             end
         end, data)
+        cb(1)
     end)
 end

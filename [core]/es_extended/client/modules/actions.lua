@@ -15,13 +15,16 @@ local function GetData(vehicle)
     end
     local model = GetEntityModel(vehicle)
     local displayName = GetDisplayNameFromVehicleModel(model)
-    local netId = VehToNet(vehicle)
+    local netId = vehicle
+    if NetworkGetEntityIsNetworked(vehicle) then
+        netId = VehToNet(vehicle)
+    end
     return displayName, netId
 end
 
 CreateThread(function()
     while true do
-
+        ESX.SetPlayerData('coords',GetEntityCoords(playerPed))
         if playerPed ~= PlayerPedId() then
             playerPed = PlayerPedId()
             ESX.SetPlayerData('ped', playerPed)
@@ -37,7 +40,7 @@ CreateThread(function()
             isJumping = false
         end
 
-         if IsPauseMenuActive() and not inPauseMenu then
+        if IsPauseMenuActive() and not inPauseMenu then
             inPauseMenu = true
             TriggerEvent('esx:pauseMenuActive', inPauseMenu)
         elseif not IsPauseMenuActive() and inPauseMenu then
@@ -52,7 +55,7 @@ CreateThread(function()
                 local vehicle = GetVehiclePedIsTryingToEnter(playerPed)
                 local plate = GetVehicleNumberPlateText(vehicle)
                 local seat = GetSeatPedIsTryingToEnter(playerPed)
-                local displayName, netId = GetData(vehicle)
+                local _, netId = GetData(vehicle)
                 isEnteringVehicle = true
                 TriggerEvent('esx:enteringVehicle', vehicle, plate, seat, netId)
                 TriggerServerEvent('esx:enteringVehicle', plate, seat, netId)
@@ -87,7 +90,6 @@ CreateThread(function()
 end)
 
 if Config.EnableDebug then
-
     AddEventHandler('esx:playerPedChanged', function(netId)
         print('esx:playerPedChanged', netId)
     end)
@@ -111,5 +113,4 @@ if Config.EnableDebug then
     AddEventHandler('esx:exitedVehicle', function(vehicle, plate, seat, displayName, netId)
         print('esx:exitedVehicle', 'vehicle', vehicle, 'plate', plate, 'seat', seat, 'displayName', displayName, 'netId', netId)
     end)
-
 end
