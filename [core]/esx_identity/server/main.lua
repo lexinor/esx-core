@@ -53,7 +53,7 @@ local function checkDOBFormat(str)
             return d < 28
         end
     else
-        return d < 31
+        return d <= 31
     end
 end
 
