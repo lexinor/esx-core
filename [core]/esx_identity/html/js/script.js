@@ -8,9 +8,24 @@ const datepicker = new Datepicker(dateofbirth, {
   autohide: true,
   beforeShowDay: (date) => {
     return {
-        classes: 'has-background-info',
+        classes: 'prev',
     };
   },
+  beforeShowMonth: (date) => {
+    return {
+        classes: 'prev',
+    };
+  },
+  beforeShowYear: (date) => {
+    return {
+        classes: 'prev',
+    };
+  },
+  beforeShowDecade: (date) => {
+    return {
+        classes: 'prev',
+    };
+  },  
 });
 
 window.addEventListener("message", (event) => {
