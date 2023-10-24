@@ -49,7 +49,7 @@ Config.Multichar                 = GetResourceState("esx_multicharacter") ~= "mi
 Config.Identity                  = true  -- Select a characters identity data before they have loaded in (this happens by default with multichar)
 Config.DistanceGive              = 4.0   -- Max distance when giving items, weapons etc.
 
-Config.AdminLogging              = false -- Logs the usage of certain commands by those with group.admin ace permissions (default is false)
+Config.AdminLogging              = true -- Logs the usage of certain commands by those with group.admin ace permissions (default is false)
 
 Config.DisableHealthRegeneration = true -- Player will no longer regenerate health
 Config.DisableVehicleRewards     = true -- Disables Player Recieving weapons from vehicles
@@ -59,7 +59,7 @@ Config.DisableScenarios          = true -- Disable Scenarios
 Config.DisableWeaponWheel        = true -- Disables default weapon wheel
 Config.DisableAimAssist          = true -- disables AIM assist (mainly on controllers)
 Config.DisableVehicleSeatShuff   = true -- Disables vehicle seat shuff
-Config.DisableDisplayAmmo  		 = false -- Disable ammunition display
+Config.DisableDisplayAmmo  		 = true -- Disable ammunition display
 Config.RemoveHudComponents       = {
 	[1] = true,                         --WANTED_STARS,
 	[2] = true,                         --WEAPON_ICON
@@ -85,7 +85,7 @@ Config.RemoveHudComponents       = {
 	[22] = false,                        --HUD_WEAPONS
 }
 
-Config.SpawnVehMaxUpgrades       = true       -- admin vehicles spawn with max vehcle settings
+Config.SpawnVehMaxUpgrades       = false       -- admin vehicles spawn with max vehcle settings
 Config.CustomAIPlates            = 'AA11AA..' -- Custom plates for AI vehicles 
 -- Pattern string format
 --1 will lead to a random number from 0-9.
