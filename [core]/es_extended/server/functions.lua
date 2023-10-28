@@ -176,6 +176,8 @@ function Core.SavePlayer(xPlayer, cb)
     json.encode(xPlayer.getAccounts(true)),
     xPlayer.job.name,
     xPlayer.job.grade,
+	xPlayer.faction.name,
+    xPlayer.faction.grade,
     xPlayer.group,
     json.encode(xPlayer.getCoords()),
     json.encode(xPlayer.getInventory(true)), 
