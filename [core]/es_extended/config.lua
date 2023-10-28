@@ -37,7 +37,7 @@ Config.AdminGroups = {
 
 Config.EnablePaycheck            = true      -- enable paycheck
 Config.LogPaycheck               = false     -- Logs paychecks to a nominated Discord channel via webhook (default is false)
-Config.EnableSocietyPayouts      = true     -- pay from the society account that the player is employed at? Requirement: esx_society
+Config.EnableSocietyPayouts      = false     -- pay from the society account that the player is employed at? Requirement: esx_society
 Config.MaxWeight                 = 50        -- the max inventory weight without backpack
 Config.PaycheckInterval          = 15 * 60000 -- how often to recieve pay checks in milliseconds
 Config.EnableDebug               = false     -- Use Debug options?
