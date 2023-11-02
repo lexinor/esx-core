@@ -44,7 +44,7 @@ if not Config.UseDeferrals then
 
     RegisterNetEvent('esx_identity:showRegisterIdentity', function()
         if Config.PELoadingScreen then
-            exports["pe-basicloading"]:shutdown()
+            exports["nd_loadingscreen"]:shutdown()
         end        
         TriggerEvent('esx_skin:resetFirstSpawn')
         while not (ready and loadingScreenFinished) do
