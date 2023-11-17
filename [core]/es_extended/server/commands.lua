@@ -131,8 +131,7 @@ ESX.RegisterCommand({ 'cardel', 'dv' }, { "dev", "superadmin", "admin"}, functio
 			DeleteEntity(PedVehicle)
 		end
 	end
-	local Vehicles = ESX.OneSync.GetVehiclesInArea(GetEntityCoords(GetPlayerPed(xPlayer.source)),
-		tonumber(args.radius) or 5.0)
+	local Vehicles = ESX.OneSync.GetVehiclesInArea(GetEntityCoords(GetPlayerPed(xPlayer.source)), tonumber(args.radius) or 2.0)
 	for i = 1, #Vehicles do
 		local Vehicle = NetworkGetEntityFromNetworkId(Vehicles[i])
 		if DoesEntityExist(Vehicle) then
@@ -157,7 +156,7 @@ end, false, {
 	}
 })
 
-ESX.RegisterCommand({ 'fix', 'repair' }, 'admin', function(xPlayer, args, showError)
+ESX.RegisterCommand({ 'fix', 'repair' }, { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
     local xTarget = args.playerId
 	local ped = GetPlayerPed(xTarget.source)
 	local pedVehicle = GetVehiclePedIsIn(ped, false)
@@ -233,7 +232,7 @@ end, true, {
 	}
 })
 
-ESX.RegisterCommand('removeaccountmoney', 'admin', function(xPlayer, args, showError)
+ESX.RegisterCommand('removeaccountmoney', { "dev", "superadmin"}, function(xPlayer, args, showError)
 	if not args.playerId.getAccount(args.account) then
 		return showError(TranslateCap('command_removeaccountmoney_invalid'))
 	end
@@ -303,7 +302,7 @@ if not Config.OxInventory then
 		}
 	})
 
-	ESX.RegisterCommand('giveammo', 'admin', function(xPlayer, args, showError)
+	ESX.RegisterCommand('giveammo', { "dev", "superadmin", "admin"}, function(xPlayer, args, showError)
 		if not args.playerId.hasWeapon(args.weapon) then
 			return showError(TranslateCap("command_giveammo_noweapon_found"))
 		end
