@@ -34,7 +34,7 @@ Config.AdminGroups = {
 	['mod'] = true,
 }
 
-
+Config.PayCheckOnlyOnduty		 = true
 Config.EnablePaycheck            = true      -- enable paycheck
 Config.LogPaycheck               = true     -- Logs paychecks to a nominated Discord channel via webhook (default is false)
 Config.EnableSocietyPayouts      = false     -- pay from the society account that the player is employed at? Requirement: esx_society

@@ -383,7 +383,7 @@ function ESX.DiscordLogFields(name, title, color, fields)
 		}
 	} }
 	PerformHttpRequest(webHook, nil, 'POST', json.encode({
-		username = 'Logs',
+		username = 'ESX',
 		embeds = embedData
 	}), {
 		['Content-Type'] = 'application/json'
