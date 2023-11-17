@@ -60,20 +60,16 @@ function StartPayCheck()
             end
             
           else -- generic job
-            local paycheckSucess = false
             if Config.PayCheckOnlyOnduty == true and Player(xPlayer.source).state.onduty == true or Config.PayCheckOnlyOnduty == false then
                 xPlayer.addAccountMoney('bank', salary, "Salaire")
-                paycheckSucess = true
-            end
-            if Config.LogPaycheck and paycheckSucess == true then
+
                 ESX.DiscordLogFields("Paycheck", "Salaire - " .. jobLabel, "green", {
                     { name = "Joueur", value = xPlayer.name,    inline = true },
                     { name = "ID",     value = xPlayer.source,  inline = true },
                     { name = "JOB",    value = jobLabel,        inline = true },
                     { name = "Montant", value = salary,         inline = true },
                 })
-            end
-            if paycheckSucess == true then
+
                 TriggerClientEvent('esx:showAdvancedNotification', player, TranslateCap('bank'), TranslateCap('received_paycheck'), TranslateCap('received_salary', salary),
                 'CHAR_BANK_MAZE', 9)
             end
