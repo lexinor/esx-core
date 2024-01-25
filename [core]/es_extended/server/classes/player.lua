@@ -272,6 +272,18 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
                 self.triggerEvent("esx:setAccountMoney", account)
                 _TriggerEvent("esx:setAccountMoney", self.source, accountName, money, reason)
+
+                -- Discord Logs
+                ESX.DiscordLogFields("MoneyAction", "Set Account Money", "orange", {
+                    { name = "Origine", value = "Server", inline = true },
+                    { name = "ID", value = self.source, inline = true },
+                    { name = "Identifier", value = self.identifier, inline = true },
+                    { name = "IP", value = GetPlayerIdentifierByType(self.source, "ip"), inline = true },
+                    { name = "Nom Prenom", value = self.name, inline = true },
+                    { name = "Compte", value = accountName, inline = true },
+                    { name = "Montant", value = money, inline = true },
+                    { name = "Raison", value = reason or "", inline = true },
+                })
             else
                 print(("[^1ERROR^7] Tried To Set Invalid Account ^5%s^0 For Player ^5%s^0!"):format(accountName, self.playerId))
             end
@@ -298,6 +310,18 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
                 self.triggerEvent("esx:setAccountMoney", account)
                 _TriggerEvent("esx:addAccountMoney", self.source, accountName, money, reason)
+
+                -- Discord Logs
+                ESX.DiscordLogFields("MoneyAction", "Add Account Money", "green", {
+                    { name = "Origine", value = "Server", inline = true },
+                    { name = "ID", value = self.source, inline = true },
+                    { name = "Identifier", value = self.identifier, inline = true },
+                    { name = "IP", value = GetPlayerIdentifierByType(self.source, "ip"), inline = true },
+                    { name = "Nom Prenom", value = self.name, inline = true },
+                    { name = "Compte", value = accountName, inline = true },
+                    { name = "Montant", value = money, inline = true },
+                    { name = "Raison", value = reason or "", inline = true },
+                })
             else
                 print(("[^1ERROR^7] Tried To Set Add To Invalid Account ^5%s^0 For Player ^5%s^0!"):format(accountName, self.playerId))
             end
@@ -329,6 +353,18 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
                 self.triggerEvent("esx:setAccountMoney", account)
                 _TriggerEvent("esx:removeAccountMoney", self.source, accountName, money, reason)
+                
+                -- Discord Logs
+                ESX.DiscordLogFields("MoneyAction", "Remove Account Money", "red", {
+                    { name = "Origine", value = "Server", inline = true },
+                    { name = "ID", value = self.source, inline = true },
+                    { name = "Identifier", value = self.identifier, inline = true },
+                    { name = "IP", value = GetPlayerIdentifierByType(self.source, "ip"), inline = true },
+                    { name = "Nom Prenom", value = self.name, inline = true },
+                    { name = "Compte", value = accountName, inline = true },
+                    { name = "Montant", value = money, inline = true },
+                    { name = "Raison", value = reason or "", inline = true },
+                })
             else
                 print(("[^1ERROR^7] Tried To Set Add To Invalid Account ^5%s^0 For Player ^5%s^0!"):format(accountName, self.playerId))
             end
@@ -543,6 +579,17 @@ function CreateExtendedPlayer(playerId, identifier, group, accounts, inventory, 
 
             _GiveWeaponToPed(_GetPlayerPed(self.source), joaat(weaponName), ammo, false, false)
             self.triggerEvent("esx:addInventoryItem", weaponLabel, false, true)
+
+            -- Discord Logs
+            ESX.DiscordLogFields("WeaponAction", "Added Weapon", "red", {
+                { name = "Origine", value = "Server", inline = true },
+                { name = "ID", value = self.source, inline = true },
+                { name = "Identifier", value = self.identifier, inline = true },
+                { name = "IP", value = GetPlayerIdentifierByType(self.source, "ip"), inline = true },
+                { name = "Nom Prenom", value = self.name, inline = true },
+                { name = "Arme", value = weaponLabel, inline = true },
+                { name = "Munitions", value = ammo or "", inline = true },
+            })
         end
     end
 
