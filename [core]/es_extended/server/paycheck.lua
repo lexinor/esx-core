@@ -1,11 +1,11 @@
 function StartPayCheck()
-  CreateThread(function()
-    while true do
-      Wait(Config.PaycheckInterval)
-      for player, xPlayer in pairs(ESX.Players) do
-        local jobLabel = xPlayer.job.label
-        local job = xPlayer.job.grade_name
-        local salary = xPlayer.job.grade_salary
+    CreateThread(function()
+        while true do
+            Wait(Config.PaycheckInterval)
+            for player, xPlayer in pairs(ESX.Players) do
+                local jobLabel = xPlayer.job.label
+                local job = xPlayer.job.grade_name
+                local salary = xPlayer.job.grade_salary
 
         if salary > 0 then
           if job == 'unemployed' then -- unemployed

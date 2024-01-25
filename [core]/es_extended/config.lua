@@ -1,19 +1,19 @@
-Config                      = {}
-Config.Locale               = GetConvar('esx:locale', 'fr')
+Config = {}
+Config.Locale = GetConvar("esx:locale", "en")
 
-Config.Accounts             = {
-	bank = {
-		label = TranslateCap('account_bank'),
-		round = true
-	},
-	black_money = {
-		label = TranslateCap('account_black_money'),
-		round = true
-	},
-	money = {
-		label = TranslateCap('account_money'),
-		round = true
-	}
+Config.Accounts = {
+    bank = {
+        label = TranslateCap("account_bank"),
+        round = true,
+    },
+    black_money = {
+        label = TranslateCap("account_black_money"),
+        round = true,
+    },
+    money = {
+        label = TranslateCap("account_money"),
+        round = true,
+    },
 }
 
 Config.StartingAccountMoney = { bank = 12000, money = 3000  }
@@ -45,48 +45,48 @@ Config.EnableDefaultInventory    = true      -- Display the default Inventory ( 
 Config.EnableWantedLevel         = false     -- Use Normal GTA wanted Level?
 Config.EnablePVP                 = true      -- Allow Player to player combat
 
-Config.Multichar                 = GetResourceState("esx_multicharacter") ~= "missing"
-Config.Identity                  = true  -- Select a characters identity data before they have loaded in (this happens by default with multichar)
-Config.DistanceGive              = 4.0   -- Max distance when giving items, weapons etc.
+Config.Multichar = GetResourceState("esx_multicharacter") ~= "missing"
+Config.Identity = true -- Select a characters identity data before they have loaded in (this happens by default with multichar)
+Config.DistanceGive = 4.0 -- Max distance when giving items, weapons etc.
 
 Config.AdminLogging              = true -- Logs the usage of certain commands by those with group.admin ace permissions (default is false)
 
 Config.DisableHealthRegeneration = true -- Player will no longer regenerate health
-Config.DisableVehicleRewards     = true -- Disables Player Recieving weapons from vehicles
-Config.DisableNPCDrops           = true -- stops NPCs from dropping weapons on death
-Config.DisableDispatchServices   = true -- Disable Dispatch services
-Config.DisableScenarios          = true -- Disable Scenarios
-Config.DisableWeaponWheel        = true -- Disables default weapon wheel
-Config.DisableAimAssist          = true -- disables AIM assist (mainly on controllers)
-Config.DisableVehicleSeatShuff   = true -- Disables vehicle seat shuff
-Config.DisableDisplayAmmo  		 = true -- Disable ammunition display
-Config.RemoveHudComponents       = {
-	[1] = true,                         --WANTED_STARS,
-	[2] = true,                         --WEAPON_ICON
-	[3] = true,                         --CASH
-	[4] = true,                         --MP_CASH
-	[5] = true,                         --MP_MESSAGE
-	[6] = true,                         --VEHICLE_NAME
-	[7] = true,                         -- AREA_NAME
-	[8] = true,                         -- VEHICLE_CLASS
-	[9] = false,                         --STREET_NAME
-	[10] = false,                        --HELP_TEXT
-	[11] = false,                        --FLOATING_HELP_TEXT_1
-	[12] = false,                        --FLOATING_HELP_TEXT_2
-	[13] = false,                        --CASH_CHANGE
-	[14] = false,                        --RETICLE
-	[15] = false,                        --SUBTITLE_TEXT
-	[16] = false,                        --RADIO_STATIONS
-	[17] = false,                        --SAVING_GAME,
-	[18] = false,                        --GAME_STREAM
-	[19] = true,                        --WEAPON_WHEEL
-	[20] = true,                        --WEAPON_WHEEL_STATS
-	[21] = true,                        --HUD_COMPONENTS
-	[22] = false,                        --HUD_WEAPONS
+Config.DisableVehicleRewards = true -- Disables Player Recieving weapons from vehicles
+Config.DisableNPCDrops = true -- stops NPCs from dropping weapons on death
+Config.DisableDispatchServices = true -- Disable Dispatch services
+Config.DisableScenarios = true -- Disable Scenarios
+Config.DisableWeaponWheel = true -- Disables default weapon wheel
+Config.DisableAimAssist = true -- disables AIM assist (mainly on controllers)
+Config.DisableVehicleSeatShuff = true -- Disables vehicle seat shuff
+Config.DisableDisplayAmmo = true -- Disable ammunition display
+Config.RemoveHudComponents = {
+    [1] = true, --WANTED_STARS,
+    [2] = true, --WEAPON_ICON
+    [3] = true, --CASH
+    [4] = true, --MP_CASH
+    [5] = true, --MP_MESSAGE
+    [6] = false, --VEHICLE_NAME
+    [7] = false, -- AREA_NAME
+    [8] = false, -- VEHICLE_CLASS
+    [9] = false, --STREET_NAME
+    [10] = false, --HELP_TEXT
+    [11] = false, --FLOATING_HELP_TEXT_1
+    [12] = false, --FLOATING_HELP_TEXT_2
+    [13] = false, --CASH_CHANGE
+    [14] = false, --RETICLE
+    [15] = false, --SUBTITLE_TEXT
+    [16] = false, --RADIO_STATIONS
+    [17] = false, --SAVING_GAME,
+    [18] = false, --GAME_STREAM
+    [19] = true, --WEAPON_WHEEL
+    [20] = true, --WEAPON_WHEEL_STATS
+    [21] = false, --HUD_COMPONENTS
+    [22] = false, --HUD_WEAPONS
 }
 
-Config.SpawnVehMaxUpgrades       = false       -- admin vehicles spawn with max vehcle settings
-Config.CustomAIPlates            = 'AA11AA..' -- Custom plates for AI vehicles 
+Config.SpawnVehMaxUpgrades = false -- admin vehicles spawn with max vehcle settings
+Config.CustomAIPlates = "AA11AA.." -- Custom plates for AI vehicles 
 -- Pattern string format
 --1 will lead to a random number from 0-9.
 --A will lead to a random letter from A-Z.

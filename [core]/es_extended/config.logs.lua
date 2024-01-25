@@ -18,6 +18,6 @@ Config.DiscordLogs = {
         orange = 16744192,
         yellow = 16776960,
         pink = 16761035,
-        lightgreen = 65309
-    }
+        lightgreen = 65309,
+    },
 }
