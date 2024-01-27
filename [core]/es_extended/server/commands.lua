@@ -259,10 +259,7 @@ end, true, {
 })
 
 if not Config.OxInventory then
-    ESX.RegisterCommand(
-        "giveitem",
-        "admin",
-        function(xPlayer, args)
+    ESX.RegisterCommand("giveitem", {"dev", "superadmin", "admin"}, function(xPlayer, args, showError)
             args.playerId.addInventoryItem(args.item, args.count)
             if Config.AdminLogging then
                 ESX.DiscordLogFields("UserActions", "Give Item /giveitem Triggered!", "pink", {
@@ -286,10 +283,7 @@ if not Config.OxInventory then
         }
     )
 
-    ESX.RegisterCommand(
-        "giveweapon",
-        "admin",
-        function(xPlayer, args, showError)
+    ESX.RegisterCommand("giveweapon", {"dev", "superadmin", "admin"}, function(xPlayer, args, showError)
             if args.playerId.hasWeapon(args.weapon) then
                 return showError(TranslateCap("command_giveweapon_hasalready"))
             end
@@ -316,10 +310,7 @@ if not Config.OxInventory then
         }
     )
 
-    ESX.RegisterCommand(
-        "giveammo",
-        "admin",
-        function(xPlayer, args, showError)
+    ESX.RegisterCommand("giveammo", {"dev", "superadmin", "admin"}, function(xPlayer, args, showError)
             if not args.playerId.hasWeapon(args.weapon) then
                 return showError(TranslateCap("command_giveammo_noweapon_found"))
             end
