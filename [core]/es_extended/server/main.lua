@@ -185,12 +185,12 @@ function loadESXPlayer(identifier, playerId, isNew)
 
     if not ESX.DoesJobExist(faction, gradeF) then
         print(("[^3WARNING^7] Ignoring invalid faction for ^5%s^7 [faction: ^5%s^7, grade: ^5%s^7]"):format(identifier, faction, gradeF))
-        faction, gradeF = "unemployed", "0"
+        faction, gradeF = "nofaction", "0"
     end
-
+    
     factionObject, gradeFactionObject = ESX.Factions[faction], ESX.Factions[faction].grades[gradeF]
 
-    userData.job = {
+    userData.faction = {
         id = factionObject.id,
         name = factionObject.name,
         label = factionObject.label,
