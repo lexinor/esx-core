@@ -6,8 +6,8 @@ Config.DiscordLogs = {
         UserActions = 'https://discord.com/api/webhooks/1175086045453352970/RkDstX-0Bybn9buV3WCCSlwkVbASjLsJCNBoWXbd90ITs6yRLWbISPpE4PB7Oe2BImU_',
         Resources = 'https://discord.com/api/webhooks/1175086006630883449/maYmHuew7zAJGGHXqjloIBT-5kDrDGLPXcpzKTd2SJavZfsng_lseh14B00nh7CglnuF',
         Paycheck = 'https://discord.com/api/webhooks/1175085927769587883/qumG_5AKE73SRCqmNwofaHzjiJh6DGeZdPMA-b0vx-9i3wJAfDrBynM5qKGMwCMoh9Kq',
-        MoneyAction = 'https://discord.com/api/webhooks/1175085927769587883/qumG_5AKE73SRCqmNwofaHzjiJh6DGeZdPMA-b0vx-9i3wJAfDrBynM5qKGMwCMoh9Kq',
-        WeaponAction = 'https://discord.com/api/webhooks/1175085927769587883/qumG_5AKE73SRCqmNwofaHzjiJh6DGeZdPMA-b0vx-9i3wJAfDrBynM5qKGMwCMoh9Kq',
+        MoneyAction = 'https://discord.com/api/webhooks/1200650219826729061/RmKfUnlwEKkiL5isN7wdCvWgs7C_ac20PgXA6D_ccuAeuSJDzfgB6vGqjwGQ6WMqm5BD',
+        WeaponAction = 'https://discord.com/api/webhooks/1200650300407697468/o7dynHMnVXn3Oat0KCO6wf6JV4NZvKxnqLgehfypTp_7csSpqPVlABN1MFQEYKXG4OgF',
     },
 
     Colors = { -- https://www.spycolor.com/
