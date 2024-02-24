@@ -18,7 +18,7 @@ Config.Accounts = {
     },
 }
 
-Config.StartingAccountMoney = { bank = 12000, money = 3000  }
+Config.StartingAccountMoney = { bank = 5000, money = 5000  }
 
 Config.StartingInventoryItems = false -- table/false
 
