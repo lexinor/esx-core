@@ -1,9 +1,11 @@
 game 'common'
 
-version '1.10.4'
 fx_version 'cerulean'
 author 'ESX-Framework'
+description 'Allows resources to Run tasks at specific intervals.'
+version '1.10.10'
 lua54 'yes'
+
 loadscreen 'index.html'
 
 shared_script 'config.lua'

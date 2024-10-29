@@ -25,15 +25,21 @@ function ESX.SpawnPlayer(skin, coords, cb)
     end)
     Citizen.Await(p)
 
+    RequestCollisionAtCoord(coords.x, coords.y, coords.z)
+
     local playerPed = PlayerPedId()
+    local timer = GetGameTimer()
+
     FreezeEntityPosition(playerPed, true)
     SetEntityCoordsNoOffset(playerPed, coords.x, coords.y, coords.z, false, false, false, true)
     SetEntityHeading(playerPed, coords.heading)
-    while not HasCollisionLoadedAroundEntity(playerPed) do
+
+    while not HasCollisionLoadedAroundEntity(playerPed) and (GetGameTimer() - timer) < 5000 do
         Wait(0)
     end
-    FreezeEntityPosition(playerPed, false)
+
     NetworkResurrectLocalPlayer(coords.x, coords.y, coords.z, coords.heading, true, true, false)
+    TriggerEvent('playerSpawned', coords)
     cb()
 end
 
@@ -55,7 +61,7 @@ AddEventHandler("esx:playerLoaded", function(xPlayer, _, skin)
     while not DoesEntityExist(ESX.PlayerData.ped) do
         Wait(20)
     end
-    
+
     ESX.PlayerLoaded = true
 
     local metadata = ESX.PlayerData.metadata
@@ -71,7 +77,7 @@ AddEventHandler("esx:playerLoaded", function(xPlayer, _, skin)
     local timer = GetGameTimer()
     while not HaveAllStreamingRequestsCompleted(ESX.PlayerData.ped) and (GetGameTimer() - timer) < 2000 do
         Wait(0)
-    end 
+    end
 
     if Config.EnablePVP then
         SetCanAttackFriendly(ESX.PlayerData.ped, true, false)
@@ -139,6 +145,7 @@ AddEventHandler("esx:playerLoaded", function(xPlayer, _, skin)
         for i = 1, 15 do
             EnableDispatchService(i, false)
         end
+        SetAudioFlag('PoliceScannerDisabled', true)
     end
 
     -- Disable Scenarios
@@ -200,6 +207,10 @@ AddEventHandler("esx:playerLoaded", function(xPlayer, _, skin)
         for _, v in pairs(scenarios) do
             SetScenarioTypeEnabled(v, false)
         end
+    end
+
+    if not Config.Multichar then
+        FreezeEntityPosition(ESX.PlayerData.ped, false)
     end
 
     if IsScreenFadedOut() then
@@ -270,29 +281,13 @@ AddEventHandler("esx:restoreLoadout", function()
     end
 end)
 
--- Credit: https://github.com/LukeWasTakenn, https://github.com/LukeWasTakenn/luke_garages/blob/master/client/client.lua#L331-L352
 AddStateBagChangeHandler("VehicleProperties", nil, function(bagName, _, value)
     if not value then
         return
     end
 
     local netId = bagName:gsub("entity:", "")
-    local timer = GetGameTimer()
-    while not NetworkDoesEntityExistWithNetworkId(tonumber(netId)) do
-        Wait(0)
-        if GetGameTimer() - timer > 10000 then
-            return
-        end
-    end
-
     local vehicle = NetToVeh(tonumber(netId))
-    local timer2 = GetGameTimer()
-    while NetworkGetEntityOwner(vehicle) ~= PlayerId() do
-        Wait(0)
-        if GetGameTimer() - timer2 > 10000 then
-            return
-        end
-    end
 
     ESX.Game.SetVehicleProperties(vehicle, value)
 end)
@@ -342,17 +337,17 @@ if not Config.OxInventory then
 
     RegisterNetEvent("esx:addWeapon")
     AddEventHandler("esx:addWeapon", function()
-        print("[^1ERROR^7] event ^5'esx:addWeapon'^7 Has Been Removed. Please use ^5xPlayer.addWeapon^7 Instead!")
+        error("event ^5'esx:addWeapon'^7 Has Been Removed. Please use ^5xPlayer.addWeapon^7 Instead!")
     end)
 
     RegisterNetEvent("esx:addWeaponComponent")
     AddEventHandler("esx:addWeaponComponent", function()
-        print("[^1ERROR^7] event ^5'esx:addWeaponComponent'^7 Has Been Removed. Please use ^5xPlayer.addWeaponComponent^7 Instead!")
+        error("event ^5'esx:addWeaponComponent'^7 Has Been Removed. Please use ^5xPlayer.addWeaponComponent^7 Instead!")
     end)
 
     RegisterNetEvent("esx:setWeaponAmmo")
     AddEventHandler("esx:setWeaponAmmo", function()
-        print("[^1ERROR^7] event ^5'esx:setWeaponAmmo'^7 Has Been Removed. Please use ^5xPlayer.addWeaponAmmo^7 Instead!")
+        error("event ^5'esx:setWeaponAmmo'^7 Has Been Removed. Please use ^5xPlayer.addWeaponAmmo^7 Instead!")
     end)
 
     RegisterNetEvent("esx:setWeaponTint")
@@ -362,7 +357,7 @@ if not Config.OxInventory then
 
     RegisterNetEvent("esx:removeWeapon")
     AddEventHandler("esx:removeWeapon", function()
-        print("[^1ERROR^7] event ^5'esx:removeWeapon'^7 Has Been Removed. Please use ^5xPlayer.removeWeapon^7 Instead!")
+        error("event ^5'esx:removeWeapon'^7 Has Been Removed. Please use ^5xPlayer.removeWeapon^7 Instead!")
     end)
 
     RegisterNetEvent("esx:removeWeaponComponent")
@@ -375,11 +370,6 @@ end
 RegisterNetEvent("esx:setJob")
 AddEventHandler("esx:setJob", function(Job)
     ESX.SetPlayerData("job", Job)
-end)
-
-RegisterNetEvent('esx:setFaction')
-AddEventHandler('esx:setFaction', function(Faction)
-	ESX.SetPlayerData('faction', Faction)
 end)
 
 RegisterNetEvent('esx:setFaction')
@@ -429,6 +419,11 @@ AddEventHandler('esx:spawnVehicle', function(vehicle)
 			end
 		end
 	end)
+end)
+
+RegisterNetEvent("esx:setGroup")
+AddEventHandler("esx:setGroup", function(group)
+    ESX.SetPlayerData("group", group)
 end)
 
 if not Config.OxInventory then
@@ -773,6 +768,6 @@ ESX.RegisterClientCallback("esx:GetVehicleType", function(cb, model)
     cb(ESX.GetVehicleType(model))
 end)
 
-AddStateBagChangeHandler("metadata", "player:" .. tostring(GetPlayerServerId(PlayerId())), function(_, key, val)
-    ESX.SetPlayerData(key, val)
+RegisterNetEvent('esx:updatePlayerData', function(key, val)
+	ESX.SetPlayerData(key, val)
 end)
